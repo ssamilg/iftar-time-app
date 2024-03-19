@@ -7,19 +7,20 @@ const state = reactive({
   city: 'Ankara',
   times: [],
   isNextSahur: false,
+  nextTimeLabel: '',
+  isInitialized: false,
 });
 
 const store = useStore();
 
 const timesTRTranslation = {
-  Fajr: 'Sabah',
+  Sunrise: 'Gün Doğumu',
+  Fajr: 'Imsak',
   Dhuhr: 'Öğle',
   Asr: 'İkindi',
   Maghrib: 'Akşam',
   Isha: 'Yatsı',
 };
-
-
 
 const iftarTime = computed(() => {
   return getAdhanTime('Maghrib');
@@ -59,6 +60,7 @@ const fetchData = async () => {
 
   const { data:response } = await store.fetchTimesByCity(params);
   state.response = response;
+  state.isInitialized = true;
 
   setAdhanTimeList();
   startCounter();
@@ -73,6 +75,7 @@ const setAdhanTimeList = () => {
     'Asr',
     'Maghrib',
     'Isha',
+    'Sunrise',
   ];
 
   state.times = adhanTimeList.map((name) => {
@@ -140,9 +143,11 @@ const timer = () => {
   const mode = checkTimerMode();
 
   if (mode === 'sahur') {
+    state.nextTimeLabel = 'Sahur';
     return timeUntilSahur;
   }
 
+  state.nextTimeLabel = 'İftar';
   return timeUntilIftar;
 };
 
@@ -168,50 +173,89 @@ const checkTimerMode = () => {
 
 
 onMounted(() => {
-  fetchData();
+  // fetchData();
 });
 </script>
 
 <template>
-  <div class="flex h-full w-full items-center justify-center">
+  <div class="flex h-[100vh] w-full items-center justify-center">
     <div class="basis-auto text-primary">
-      <div class="flex">
-        {{ state.city }}
-        <input v-model="state.city" class="input input-bordered mr-2">
-        <button @click="fetchData" class="btn btn-primary">Get Data</button>
+      <div v-show="!state.isInitialized" class="flex h-full">
+        <div class="basis-full">
+          <div class="flex">
+            <input v-model="state.city" class="input input-bordered input-lg mr-2 text-center">
+          </div>
+
+          <div class="flex mt-4 text-3xl w-full justify-center">
+            için iftara
+          </div>
+
+          <div class="flex mt-4">
+            <button @click="fetchData" class="btn btn-primary btn-lg w-full">Ne kadar kaldı ?</button>
+          </div>
+        </div>
       </div>
 
-      <div class="flex">
-        <div class="basi-full">
-          <div class="flex my-4">
+      <div v-show="state.isInitialized" class="flex mt-8">
+        <div class="basis-full">
+          <div class="flex capitalize text-3xl">
+            {{ state.city }} için
+            {{ state.nextTimeLabel }}'a
+          </div>
+
+          <div class="flex w-full justify-center my-4">
             <div class="grid grid-flow-col gap-5 text-center auto-cols-max">
               <div class="flex flex-col">
-                <span class="countdown font-mono text-5xl">
+                <span class="countdown countdown-digit">
                   <span id="timer-hours" style="--value:00;" />
                 </span>
-                hours
+                saat
               </div>
+
+              <div class="flex flex-col items-center text-7xl">
+                :
+              </div>
+
               <div class="flex flex-col">
-                <span class="countdown font-mono text-5xl">
+                <span class="countdown countdown-digit">
                   <span id="timer-minutes" style="--value:00;" />
                 </span>
-                min
+                dakika
               </div>
+
+              <div class="flex flex-col items-center text-7xl">
+                :
+              </div>
+
               <div class="flex flex-col">
-                <span class="countdown font-mono text-5xl">
+                <span class="countdown countdown-digit">
                   <span id="timer-seconds" style="--value:00;" />
                 </span>
-                sec
+                saniye
               </div>
             </div>
           </div>
 
-          <template v-if="state.response">
-            {{ state.response.data.timings.Maghrib }}
-          </template>
+          <div class="flex justify-end text-3xl">
+            kaldı
+          </div>
 
-          <div v-for="(time, index) in state.times" :key="index" class="flex">
-            {{ index }} - {{ time.name }} : {{ time.time }}
+          <div class="flex w-full justify-center mt-12">
+            <div class="basis-full">
+              <template v-if="state.response">
+                {{ state.response.data.timings.Maghrib }}
+              </template>
+
+              <div v-for="(time, index) in state.times" :key="index" class="flex text-center">
+                <div class="basis-1/2">
+                  {{ time.name }} :
+                </div>
+
+                <div class="basis-1/2">
+                  {{ time.time }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -219,3 +263,8 @@ onMounted(() => {
   </div>
 </template>
 
+<style lang="scss">
+.countdown-digit {
+  @apply text-6xl sm:text-7xl;
+}
+</style>
