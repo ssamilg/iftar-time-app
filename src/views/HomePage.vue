@@ -87,7 +87,11 @@ const setAdhanTimeList = () => {
     'Sunrise',
   ];
 
-  state.times = adhanTimeList.map((name) => {
+  state.times = adhanTimeList
+    .sort((a, b) => {
+      return timings[a] > timings[b] ? 1 : -1;
+    })
+    .map((name) => {
     return {
       name: timesTRTranslation[name],
       time: timings[name],
@@ -259,16 +263,16 @@ onMounted(() => {
             kaldı
           </div>
 
-          <div class="flex w-full justify-center mt-12">
+          <div class="flex w-full justify-center mt-12 text-lg">
             <div class="basis-full">
               <div v-for="(time, index) in state.times" :key="index" class="flex text-center justify-center">
-                <div class="basis-auto">
+                <div class="basis-full">
                   <div class="flex">
-                    <div class="basis-1/2 pr-2">
-                      {{ time.name }}:
+                    <div class="basis-1/2 pr-2 text-right">
+                      {{ time.name }}
                     </div>
 
-                    <div class="basis-1/2">
+                    <div class="basis-1/2 pl-2 text-left">
                       {{ time.time }}
                     </div>
                   </div>
@@ -278,6 +282,12 @@ onMounted(() => {
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="absolute bottom-0 text-center text-primary">
+      <a href="https://ssamilg.dev">
+        SSG
+      </a>
     </div>
   </div>
 </template>
