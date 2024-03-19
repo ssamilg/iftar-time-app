@@ -1,9 +1,11 @@
 <script setup>
+import dayjs from 'dayjs';
 import { computed, onMounted, reactive } from 'vue';
 import { useStore } from '@/stores';
 
 const state = reactive({
   response: null,
+  nextDaysTimes: null,
   city: 'Ankara',
   times: [],
   isNextSahur: false,
@@ -14,7 +16,7 @@ const state = reactive({
 const store = useStore();
 
 const timesTRTranslation = {
-  Sunrise: 'Gün Doğumu',
+  Sunrise: 'Güneş',
   Fajr: 'Imsak',
   Dhuhr: 'Öğle',
   Asr: 'İkindi',
@@ -61,6 +63,13 @@ const fetchData = async () => {
   const { data:response } = await store.fetchTimesByCity(params);
   state.response = response;
   state.isInitialized = true;
+
+  let nextDay = new Date();
+  nextDay.setDate(nextDay.getDate() + 1);
+  nextDay = dayjs(nextDay).format('DD-MM-YYYY');
+
+  const { data:nextDayResponse } = await store.fetchTimesByCityAndDate(nextDay, params);
+  state.nextDaysTimes = nextDayResponse.data;
 
   setAdhanTimeList();
   startCounter();
@@ -121,7 +130,7 @@ const setCountdownValue = (id, value) => {
 };
 
 const getAdhanTime = (name) => {
-  const { timings } = state.response.data;
+  const { timings } = state.isNextSahur ? state.nextDaysTimes : state.response.data;
   const time = timings[name];
   const [hour, minute] = time.split(':');
 
@@ -143,11 +152,11 @@ const timer = () => {
   const mode = checkTimerMode();
 
   if (mode === 'sahur') {
-    state.nextTimeLabel = 'Sahur';
+    state.nextTimeLabel = 'sahur';
     return timeUntilSahur;
   }
 
-  state.nextTimeLabel = 'İftar';
+  state.nextTimeLabel = 'iftar';
   return timeUntilIftar;
 };
 
@@ -180,7 +189,7 @@ onMounted(() => {
 <template>
   <div class="flex h-[100vh] w-full items-center justify-center">
     <div class="basis-auto text-primary">
-      <div v-show="!state.isInitialized" class="flex h-full">
+      <div v-if="!state.isInitialized" class="flex h-full">
         <div class="basis-full">
           <div class="flex">
             <input v-model="state.city" class="input input-bordered input-lg mr-2 text-center">
@@ -198,9 +207,19 @@ onMounted(() => {
 
       <div v-show="state.isInitialized" class="flex mt-8">
         <div class="basis-full">
-          <div class="flex capitalize text-3xl">
-            {{ state.city }} için
-            {{ state.nextTimeLabel }}'a
+          <div class="flex text-3xl items-center justify-between">
+            <div class="basis-auto">
+              {{ state.city }} için
+              {{ state.nextTimeLabel }}'a
+            </div>
+
+            <div class="basis-auto">
+              <button class="btn btn-circle btn-primary btn-ghost" @click="state.isInitialized = false">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div class="flex w-full justify-center my-4">
@@ -242,17 +261,17 @@ onMounted(() => {
 
           <div class="flex w-full justify-center mt-12">
             <div class="basis-full">
-              <template v-if="state.response">
-                {{ state.response.data.timings.Maghrib }}
-              </template>
+              <div v-for="(time, index) in state.times" :key="index" class="flex text-center justify-center">
+                <div class="basis-auto">
+                  <div class="flex">
+                    <div class="basis-1/2 pr-2">
+                      {{ time.name }}:
+                    </div>
 
-              <div v-for="(time, index) in state.times" :key="index" class="flex text-center">
-                <div class="basis-1/2">
-                  {{ time.name }} :
-                </div>
-
-                <div class="basis-1/2">
-                  {{ time.time }}
+                    <div class="basis-1/2">
+                      {{ time.time }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

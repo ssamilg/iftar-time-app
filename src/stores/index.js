@@ -9,5 +9,8 @@ export const useStore = defineStore('index', {
     fetchTimesByCity(params) {
       return axios.get("timingsByCity", { params });
     },
+    fetchTimesByCityAndDate(date, params) {
+      return axios.get(`timingsByCity/${date}`, { params });
+    },
   },
 })
