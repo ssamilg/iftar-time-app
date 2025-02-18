@@ -4,11 +4,12 @@ import CountdownPage from './CountdownPage.vue';
 import ThemePatterns from '../components/ThemePatterns.vue';
 import { cities } from '@/data/cities';
 
-const city = ref('Ankara');
+const DEFAULT_THEME = 'islamic';
+const city = ref(localStorage.getItem('selectedCity') || 'Ankara');
 const showCountdown = ref(false);
 const searchQuery = ref(city.value);
 const isDropdownOpen = ref(false);
-const currentTheme = ref('light');
+const currentTheme = ref(localStorage.getItem('selectedTheme') || DEFAULT_THEME);
 const themes = [
   { value: 'light', label: 'Modern', font: 'Inter' },
   { value: 'dark', label: 'Dark', font: 'Roboto' },
@@ -40,6 +41,7 @@ const handleCitySelect = (selectedCity) => {
   city.value = selectedCity;
   searchQuery.value = selectedCity;
   isDropdownOpen.value = false;
+  localStorage.setItem('selectedCity', selectedCity);
 };
 
 const handleFocus = () => {
@@ -69,14 +71,16 @@ const handleThemeChange = (event) => {
   setTimeout(() => {
     currentTheme.value = newTheme;
     html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('selectedTheme', newTheme);
     document.body.classList.remove('theme-transitioning');
-  }, 500); // Half of our transition time to ensure fade out completes
+  }, 500);
 };
 
 onMounted(() => {
   const html = document.querySelector('html');
-  const theme = html.getAttribute('data-theme') || 'light';
-  currentTheme.value = theme;
+  const savedTheme = localStorage.getItem('selectedTheme') || DEFAULT_THEME;
+  currentTheme.value = savedTheme;
+  html.setAttribute('data-theme', savedTheme);
 });
 </script>
 
@@ -191,13 +195,13 @@ body.theme-transitioning {
 
 /* Add theme-specific input styling */
 [data-theme='seljuk'] {
-  .input, .select, .btn {
+  .input, .select {
     @apply bg-opacity-50;
     backdrop-filter: blur(4px);
   }
 
   .dropdown-content {
-    @apply bg-opacity-70;
+    @apply bg-opacity-90;
     backdrop-filter: blur(8px);
   }
 }
