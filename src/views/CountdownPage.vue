@@ -1,6 +1,6 @@
 <script setup>
 import dayjs from 'dayjs';
-import { computed, onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive, onBeforeUnmount } from 'vue';
 import { useStore } from '@/stores';
 
 const props = defineProps({
@@ -10,7 +10,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['back']);
+const emit = defineEmits(['back', 'ready']);
 
 const state = reactive({
   response: null,
@@ -18,6 +18,8 @@ const state = reactive({
   times: [],
   isNextSahur: false,
   nextTimeLabel: '',
+  isLoading: true,
+  intervalId: null
 });
 
 const store = useStore();
@@ -61,24 +63,31 @@ const timeUntilSahur = computed(() => {
 });
 
 const fetchData = async () => {
-  const params = {
-    city: props.city,
-    country: 'Turkey',
-    method: 13,
-  };
+  try {
+    const params = {
+      city: props.city,
+      country: 'Turkey',
+      method: 13,
+    };
 
-  const { data:response } = await store.fetchTimesByCity(params);
-  state.response = response;
+    const { data:response } = await store.fetchTimesByCity(params);
+    state.response = response;
 
-  let nextDay = new Date();
-  nextDay.setDate(nextDay.getDate() + 1);
-  nextDay = dayjs(nextDay).format('DD-MM-YYYY');
+    let nextDay = new Date();
+    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay = dayjs(nextDay).format('DD-MM-YYYY');
 
-  const { data:nextDayResponse } = await store.fetchTimesByCityAndDate(nextDay, params);
-  state.nextDaysTimes = nextDayResponse.data;
+    const { data:nextDayResponse } = await store.fetchTimesByCityAndDate(nextDay, params);
+    state.nextDaysTimes = nextDayResponse.data;
 
-  setAdhanTimeList();
-  startCounter();
+    setAdhanTimeList();
+    startCounter();
+    emit('ready');
+  } catch (error) {
+    console.error('Error fetching prayer times:', error);
+  } finally {
+    state.isLoading = false;
+  }
 };
 
 const setAdhanTimeList = () => {
@@ -107,13 +116,18 @@ const setAdhanTimeList = () => {
 };
 
 const startCounter = () => {
+  if (state.intervalId) {
+    clearInterval(state.intervalId);
+    state.intervalId = null;
+  }
+
   let counter = timer().value;
 
   setCountdownValue('timer-seconds', counter.seconds);
   setCountdownValue('timer-minutes', counter.minutes);
   setCountdownValue('timer-hours', counter.hours);
 
-  setInterval(() => {
+  state.intervalId = setInterval(() => {
     if(counter.seconds > 0){
       counter.seconds--
     } else if(counter.seconds === 0){
@@ -132,6 +146,14 @@ const startCounter = () => {
 
     setCountdownValue('timer-seconds', counter.seconds);
   }, 1000);
+};
+
+const handleBack = () => {
+  if (state.intervalId) {
+    clearInterval(state.intervalId);
+    state.intervalId = null;
+  }
+  emit('back');
 };
 
 const setCountdownValue = (id, value) => {
@@ -189,6 +211,13 @@ const checkTimerMode = () => {
   return timerMode;
 };
 
+onBeforeUnmount(() => {
+  if (state.intervalId) {
+    clearInterval(state.intervalId);
+    state.intervalId = null;
+  }
+});
+
 onMounted(() => {
   fetchData();
 });
@@ -196,7 +225,14 @@ onMounted(() => {
 
 <template>
   <div class="flex mt-8">
-    <div class="basis-full">
+    <div v-show="state.isLoading" class="flex flex-col items-center w-full">
+      <span class="loading loading-spinner loading-lg"></span>
+      <div class="mt-4 text-xl">
+        {{ props.city }} için namaz vakitleri yükleniyor...
+      </div>
+    </div>
+
+    <div v-show="!state.isLoading" class="basis-full">
       <div class="flex text-3xl items-center justify-between">
         <div class="basis-auto">
           {{ props.city }} için
@@ -204,7 +240,7 @@ onMounted(() => {
         </div>
 
         <div class="basis-auto">
-          <button class="btn btn-circle btn-primary btn-ghost" @click="emit('back')">
+          <button class="btn btn-circle btn-primary btn-ghost" @click="handleBack">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
             </svg>
