@@ -1,12 +1,21 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import CountdownPage from './CountdownPage.vue';
+import ThemePatterns from '../components/ThemePatterns.vue';
 import { cities } from '@/data/cities';
 
 const city = ref('Ankara');
 const showCountdown = ref(false);
 const searchQuery = ref(city.value);
 const isDropdownOpen = ref(false);
+const currentTheme = ref('light');
+const themes = [
+  { value: 'light', label: 'Modern', font: 'Inter' },
+  { value: 'dark', label: 'Dark', font: 'Roboto' },
+  { value: 'islamic', label: 'Islamic', font: 'Noto Naskh Arabic' },
+  { value: 'ottoman', label: 'Ottoman', font: 'Mirza' },
+  { value: 'seljuk', label: 'Seljuk', font: 'Kavivanar' },
+];
 
 const filteredCities = computed(() => {
   if (isDropdownOpen.value && searchQuery.value === city.value) {
@@ -43,11 +52,41 @@ const handleBlur = () => {
     searchQuery.value = city.value;
   }, 200);
 };
+
+const currentFont = computed(() => {
+  const selectedTheme = themes.find(theme => theme.value === currentTheme.value);
+  return selectedTheme?.font || 'system-ui';
+});
+
+const handleThemeChange = (event) => {
+  const newTheme = event.target.value;
+  const html = document.querySelector('html');
+
+  // First fade out
+  document.body.classList.add('theme-transitioning');
+
+  // After fade out, change theme and trigger fade in
+  setTimeout(() => {
+    currentTheme.value = newTheme;
+    html.setAttribute('data-theme', newTheme);
+    document.body.classList.remove('theme-transitioning');
+  }, 500); // Half of our transition time to ensure fade out completes
+};
+
+onMounted(() => {
+  const html = document.querySelector('html');
+  const theme = html.getAttribute('data-theme') || 'light';
+  currentTheme.value = theme;
+});
 </script>
 
 <template>
-  <div class="flex h-[100vh] w-full items-center justify-center">
-    <div class="basis-auto text-primary">
+  <div
+    class="relative flex h-[100vh] w-full items-center justify-center home-page"
+    :style="{ fontFamily: currentFont }"
+  >
+    <ThemePatterns :theme="currentTheme" />
+    <div class="relative z-10 basis-auto text-primary">
       <div v-if="!showCountdown" class="flex h-full">
         <div class="basis-full">
           <div class="flex flex-col items-center">
@@ -113,7 +152,19 @@ const handleBlur = () => {
       />
     </div>
 
-    <div class="absolute bottom-0 text-center text-primary">
+    <div class="absolute bottom-0 text-center text-primary flex flex-col gap-4">
+      <div class="flex gap-2 items-center">
+        <select
+          class="select select-bordered select-sm w-32"
+          :value="currentTheme"
+          @change="handleThemeChange"
+        >
+          <option v-for="theme in themes" :key="theme.value" :value="theme.value">
+            {{ theme.label }}
+          </option>
+        </select>
+      </div>
+
       <a href="https://ssamilg.dev">
         SSG
       </a>
@@ -122,8 +173,33 @@ const handleBlur = () => {
 </template>
 
 <style lang="scss">
+body {
+  transition: opacity 1s ease;
+}
+
+body.theme-transitioning {
+  opacity: 0;
+}
+
+.home-page {
+  @apply bg-gradient-to-b from-base-100 to-base-200;
+}
+
 .countdown-digit {
   @apply text-6xl sm:text-7xl;
+}
+
+/* Add theme-specific input styling */
+[data-theme='seljuk'] {
+  .input, .select, .btn {
+    @apply bg-opacity-50;
+    backdrop-filter: blur(4px);
+  }
+
+  .dropdown-content {
+    @apply bg-opacity-70;
+    backdrop-filter: blur(8px);
+  }
 }
 
 .dropdown-content {
