@@ -129,18 +129,28 @@ const startCounter = () => {
 
   state.intervalId = setInterval(() => {
     if(counter.seconds > 0){
-      counter.seconds--
+      counter.seconds--;
     } else if(counter.seconds === 0){
       counter.seconds = 59;
 
       if (counter.minutes === 0) {
         counter.minutes = 59;
-        counter.hours--;
+
+        if (counter.hours === 0) {
+          // Timer has reached zero, restart with new target time
+          counter = timer().value;
+          setCountdownValue('timer-seconds', counter.seconds);
+          setCountdownValue('timer-minutes', counter.minutes);
+          setCountdownValue('timer-hours', counter.hours);
+        } else {
+          counter.hours--;
+          setCountdownValue('timer-hours', counter.hours);
+        }
+
         setCountdownValue('timer-minutes', counter.minutes);
-        setCountdownValue('timer-hours', counter.hours);
       } else {
         counter.minutes--;
-        setCountdownValue('timer-minutes', counter.minutes)
+        setCountdownValue('timer-minutes', counter.minutes);
       }
     }
 
