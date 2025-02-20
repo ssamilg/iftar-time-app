@@ -31,6 +31,7 @@ const filteredCities = computed(() => {
 
 const startCountdown = () => {
   showCountdown.value = true;
+  localStorage.setItem('selectedCity', city.value);
 };
 
 const handleBack = () => {
@@ -46,6 +47,7 @@ const handleCitySelect = (selectedCity) => {
 
 const handleFocus = () => {
   isDropdownOpen.value = true;
+  searchQuery.value = '';
 };
 
 const handleBlur = () => {
@@ -81,6 +83,10 @@ onMounted(() => {
   const savedTheme = localStorage.getItem('selectedTheme') || DEFAULT_THEME;
   currentTheme.value = savedTheme;
   html.setAttribute('data-theme', savedTheme);
+
+  if (localStorage.getItem('selectedCity')) {
+    showCountdown.value = true;
+  }
 });
 </script>
 
