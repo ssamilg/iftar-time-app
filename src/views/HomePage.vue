@@ -92,14 +92,14 @@ onMounted(() => {
 
 <template>
   <div
-    class="relative flex h-[100vh] w-full items-center justify-center home-page"
+    class="relative flex h-screen w-full justify-center home-page"
     :style="{ fontFamily: currentFont }"
   >
     <ThemePatterns :theme="currentTheme" />
-    <div class="relative z-10 basis-auto text-primary">
-      <div v-if="!showCountdown" class="flex h-full">
-        <div class="basis-full">
-          <div class="flex flex-col items-center">
+    <div class="basis-full text-primary">
+      <div v-if="!showCountdown" class="flex items-center h-full">
+        <div class="basis-auto w-full">
+          <div class="flex justify-center">
             <div class="dropdown w-full max-w-xs" :class="{ 'dropdown-open': isDropdownOpen }">
               <input
                 type="text"
@@ -137,20 +137,20 @@ onMounted(() => {
                 </ul>
               </div>
             </div>
+          </div>
 
-            <div class="flex mt-4 text-3xl w-full justify-center">
-              için iftara
-            </div>
+          <div class="flex mt-4 text-3xl w-full justify-center">
+            için iftara
+          </div>
 
-            <div class="flex mt-4 w-full max-w-xs">
-              <button
-                @click="startCountdown"
-                class="btn btn-primary btn-lg w-full"
-                :disabled="!city"
-              >
-                Ne kadar kaldı ?
-              </button>
-            </div>
+          <div class="flex mt-4 w-full justify-center">
+            <button
+              @click="startCountdown"
+              class="btn btn-primary btn-lg w-full max-w-xs"
+              :disabled="!city"
+            >
+              Ne kadar kaldı ?
+            </button>
           </div>
         </div>
       </div>
@@ -193,10 +193,6 @@ body.theme-transitioning {
 
 .home-page {
   @apply bg-gradient-to-b from-base-100 to-base-200;
-}
-
-.countdown-digit {
-  @apply text-6xl sm:text-7xl;
 }
 
 /* Add theme-specific input styling */
