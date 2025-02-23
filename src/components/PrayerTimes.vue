@@ -12,7 +12,7 @@ const currentTimeIndex = computed(() => {
   const now = new Date();
   const currentTimestamp = now.setHours(now.getHours(), now.getMinutes(), 0, 0);
 
-  let currentIndex = 2;
+  let currentIndex = 0;
 
   props.times.forEach((time, index) => {
     const [hours, minutes] = time.time.split(':');
