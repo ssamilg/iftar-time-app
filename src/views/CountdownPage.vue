@@ -164,11 +164,13 @@ onMounted(() => {
 
 <template>
   <div class="flex h-5/6 mt-8">
-    <div v-show="state.isLoading" class="flex flex-col items-center w-full">
-      <span class="loading loading-spinner loading-lg"></span>
-      <div class="mt-4 text-xl">
-        {{ props.city }} için namaz vakitleri yükleniyor...
+    <div v-show="state.isLoading" class="flex flex-col items-center justify-center w-full animate-fade-in gap-6">
+      <div class="loading-cycle">
+        <i class="bi bi-sun-fill cycle-icon sun"></i>
+        <i class="bi bi-moon-fill cycle-icon moon"></i>
+        <i class="bi bi-stars cycle-icon stars"></i>
       </div>
+      <div class="text-lg opacity-80">Vakitler yükleniyor...</div>
     </div>
 
     <div v-show="!state.isLoading" class="basis-full w-full">
@@ -221,5 +223,65 @@ onMounted(() => {
 
 .bi {
   font-size: 1.5rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.loading-cycle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cycle-icon {
+  position: absolute;
+  font-size: 3.5rem;
+  color: var(--primary);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  5%, 28% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  33% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.sun {
+  animation: fadeInOut 6s infinite;
+}
+
+.moon {
+  animation: fadeInOut 6s infinite 2s;
+}
+
+.stars {
+  animation: fadeInOut 6s infinite 4s;
 }
 </style>
