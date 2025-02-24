@@ -2,13 +2,11 @@
 import { ref, computed, onMounted } from 'vue';
 import CountdownPage from './CountdownPage.vue';
 import ThemePatterns from '../components/ThemePatterns.vue';
-import { cities } from '@/data/cities';
+import CitySelector from '../components/CitySelector.vue';
 
 const DEFAULT_THEME = 'islamic';
 const city = ref(localStorage.getItem('selectedCity') || 'Ankara');
 const showCountdown = ref(false);
-const searchQuery = ref(city.value);
-const isDropdownOpen = ref(false);
 const currentTheme = ref(localStorage.getItem('selectedTheme') || DEFAULT_THEME);
 const themes = [
   { value: 'light', label: 'Modern', font: 'Inter' },
@@ -20,43 +18,8 @@ const themes = [
   { value: 'ssg', label: 'SSG', font: 'Poppins' },
 ];
 
-const filteredCities = computed(() => {
-  if (isDropdownOpen.value && searchQuery.value === city.value) {
-    return cities;
-  }
-
-  const query = searchQuery.value.toLowerCase().trim();
-  return cities.filter(city =>
-    city.name.toLowerCase().includes(query)
-  );
-});
-
-const startCountdown = () => {
-  showCountdown.value = true;
-  localStorage.setItem('selectedCity', city.value);
-};
-
 const handleBack = () => {
   showCountdown.value = false;
-};
-
-const handleCitySelect = (selectedCity) => {
-  city.value = selectedCity;
-  searchQuery.value = selectedCity;
-  isDropdownOpen.value = false;
-  localStorage.setItem('selectedCity', selectedCity);
-};
-
-const handleFocus = () => {
-  isDropdownOpen.value = true;
-  searchQuery.value = '';
-};
-
-const handleBlur = () => {
-  setTimeout(() => {
-    isDropdownOpen.value = false;
-    searchQuery.value = city.value;
-  }, 200);
 };
 
 const currentFont = computed(() => {
@@ -80,6 +43,11 @@ const handleThemeChange = (event) => {
   }, 500);
 };
 
+const handleStart = (selectedCity) => {
+  city.value = selectedCity;
+  showCountdown.value = true;
+};
+
 onMounted(() => {
   const html = document.querySelector('html');
   const savedTheme = localStorage.getItem('selectedTheme') || DEFAULT_THEME;
@@ -99,63 +67,11 @@ onMounted(() => {
   >
     <ThemePatterns :theme="currentTheme" />
     <div class="basis-full text-primary">
-      <div v-if="!showCountdown" class="flex items-center h-full">
-        <div class="basis-auto w-full">
-          <div class="flex justify-center">
-            <div class="dropdown w-full max-w-xs" :class="{ 'dropdown-open': isDropdownOpen }">
-              <input
-                type="text"
-                v-model="searchQuery"
-                :placeholder="city ? '' : 'Şehir seçin'"
-                class="input input-bordered input-lg w-full text-center pr-10"
-                @focus="handleFocus"
-                @blur="handleBlur"
-              />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-              </svg>
-              <div
-                class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-96 overflow-auto"
-              >
-                <ul class="menu menu-compact">
-                  <li v-for="cityOption in filteredCities" :key="cityOption.id">
-                    <a
-                      @mousedown="handleCitySelect(cityOption.name)"
-                      :class="{ 'active': cityOption.name === city }"
-                    >
-                      {{ cityOption.name }}
-                    </a>
-                  </li>
-                  <li v-if="filteredCities.length === 0" class="text-center opacity-50 py-2">
-                    Sonuç bulunamadı
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex mt-4 text-3xl w-full justify-center">
-            için iftara
-          </div>
-
-          <div class="flex mt-4 w-full justify-center">
-            <button
-              @click="startCountdown"
-              class="btn btn-primary btn-lg w-full max-w-xs"
-              :disabled="!city"
-            >
-              Ne kadar kaldı ?
-            </button>
-          </div>
-        </div>
-      </div>
+      <CitySelector
+        v-if="!showCountdown"
+        :current-font="currentFont"
+        @start="handleStart"
+      />
 
       <CountdownPage
         v-else
@@ -195,48 +111,6 @@ body.theme-transitioning {
 
 .home-page {
   @apply bg-gradient-to-b from-base-100 to-base-200;
-}
-
-/* Add theme-specific input styling */
-[data-theme='seljuk'] {
-  .input, .select {
-    @apply bg-opacity-50;
-    backdrop-filter: blur(4px);
-  }
-
-  .dropdown-content {
-    @apply bg-opacity-90;
-    backdrop-filter: blur(8px);
-  }
-}
-
-[data-theme='digital'] {
-  .input, .select, .btn {
-    text-shadow: 0 0 5px currentColor;
-    @apply border-primary border-opacity-50;
-  }
-
-  .dropdown-content {
-    @apply bg-opacity-90 border border-primary border-opacity-30;
-    backdrop-filter: blur(8px);
-  }
-}
-
-[data-theme='ssg'] {
-  .input, .select, .btn {
-    @apply bg-base-200 border-[--primary-content] border-opacity-30;
-    transition: border-opacity 0.2s ease;
-    color: var(--primary-content);
-
-    &:hover, &:focus {
-      @apply border-opacity-100;
-    }
-  }
-
-  .dropdown-content {
-    @apply bg-base-200 border-[--primary-content] border-opacity-20;
-    backdrop-filter: blur(8px);
-  }
 }
 
 .dropdown-content {
