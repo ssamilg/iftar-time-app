@@ -1,28 +1,39 @@
 <script setup>
 import dayjs from 'dayjs';
-import { computed, onMounted, reactive, onBeforeUnmount } from 'vue';
+import 'dayjs/locale/tr';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useStore } from '@/stores';
+import CountdownTimer from '@/components/CountdownTimer.vue';
+import PrayerTimes from '@/components/PrayerTimes.vue';
+import SettingsPage from '@/views/SettingsPage.vue';
+import { getHijriMonthById } from '@/constants/hijriMonths';
+
+// Set locale to Turkish
+dayjs.locale('tr');
 
 const props = defineProps({
-  city: {
+  currentTheme: {
     type: String,
+    required: true
+  },
+  themes: {
+    type: Array,
     required: true
   }
 });
 
-const emit = defineEmits(['back', 'ready']);
+const emit = defineEmits(['back', 'ready', 'updateSettings']);
+
+const store = useStore();
+const showSettings = ref(false);
+const showDate = ref(localStorage.getItem('showDate') !== 'false');
+const showHijriDate = ref(localStorage.getItem('showHijriDate') !== 'false');
 
 const state = reactive({
-  response: null,
-  nextDaysTimes: null,
   times: [],
   isNextSahur: false,
   nextTimeLabel: '',
-  isLoading: true,
-  intervalId: null
 });
-
-const store = useStore();
 
 const timesTRTranslation = {
   Sunrise: 'Güneş',
@@ -41,57 +52,36 @@ const sahurTime = computed(() => {
   return getAdhanTime('Fajr');
 });
 
-const timeUntilIftar = computed(() => {
-  const now = new Date();
-  const iftar = iftarTime.value;
-  const diff = iftar - now;
-
-  return formatTimeDiff(diff);
+const targetTime = computed(() => {
+  const mode = checkTimerMode();
+  if (mode === 'sahur') {
+    const sahur = sahurTime.value;
+    if (state.isNextSahur) {
+      sahur.setDate(sahur.getDate() + 1);
+    }
+    return sahur;
+  }
+  return iftarTime.value;
 });
 
-const timeUntilSahur = computed(() => {
-  const now = new Date();
-  const sahur = sahurTime.value;
-
-  if (state.isNextSahur) {
-    sahur.setDate(sahur.getDate() + 1);
-  }
-
-  const diff = sahur - now;
-
-  return formatTimeDiff(diff);
+const timerMode = computed(() => {
+  return checkTimerMode();
 });
 
 const fetchData = async () => {
   try {
-    const params = {
-      city: props.city,
-      country: 'Turkey',
-      method: 13,
-    };
-
-    const { data:response } = await store.fetchTimesByCity(params);
-    state.response = response;
-
-    let nextDay = new Date();
-    nextDay.setDate(nextDay.getDate() + 1);
-    nextDay = dayjs(nextDay).format('DD-MM-YYYY');
-
-    const { data:nextDayResponse } = await store.fetchTimesByCityAndDate(nextDay, params);
-    state.nextDaysTimes = nextDayResponse.data;
-
+    await store.fetchAllTimes();
     setAdhanTimeList();
-    startCounter();
     emit('ready');
   } catch (error) {
     console.error('Error fetching prayer times:', error);
-  } finally {
-    state.isLoading = false;
   }
 };
 
 const setAdhanTimeList = () => {
-  const { timings } = state.response.data;
+  if (!store.prayerTimes) return;
+
+  const { timings } = store.prayerTimes.data;
 
   const adhanTimeList = [
     'Fajr',
@@ -102,6 +92,15 @@ const setAdhanTimeList = () => {
     'Sunrise',
   ];
 
+  const timeIcons = {
+    'Fajr': 'bi-moon-stars-fill',
+    'Dhuhr': 'bi-sun-fill',
+    'Asr': 'bi-sunset-fill',
+    'Maghrib': 'bi-moon-fill',
+    'Isha': 'bi-stars',
+    'Sunrise': 'bi-sunrise-fill',
+  };
+
   state.times = adhanTimeList
     .sort((a, b) => {
       return timings[a] > timings[b] ? 1 : -1;
@@ -110,58 +109,15 @@ const setAdhanTimeList = () => {
     return {
       name: timesTRTranslation[name],
       time: timings[name],
-      emoji: '🌙',
+      icon: timeIcons[name],
     };
   });
 };
 
-const startCounter = () => {
-  if (state.intervalId) {
-    clearInterval(state.intervalId);
-    state.intervalId = null;
-  }
-
-  let counter = timer().value;
-
-  setCountdownValue('timer-seconds', counter.seconds);
-  setCountdownValue('timer-minutes', counter.minutes);
-  setCountdownValue('timer-hours', counter.hours);
-
-  state.intervalId = setInterval(() => {
-    if(counter.seconds > 0){
-      counter.seconds--
-    } else if(counter.seconds === 0){
-      counter.seconds = 59;
-
-      if (counter.minutes === 0) {
-        counter.minutes = 59;
-        counter.hours--;
-        setCountdownValue('timer-minutes', counter.minutes);
-        setCountdownValue('timer-hours', counter.hours);
-      } else {
-        counter.minutes--;
-        setCountdownValue('timer-minutes', counter.minutes)
-      }
-    }
-
-    setCountdownValue('timer-seconds', counter.seconds);
-  }, 1000);
-};
-
-const handleBack = () => {
-  if (state.intervalId) {
-    clearInterval(state.intervalId);
-    state.intervalId = null;
-  }
-  emit('back');
-};
-
-const setCountdownValue = (id, value) => {
-  document.getElementById(id).style.setProperty('--value', value);
-};
-
 const getAdhanTime = (name) => {
-  const { timings } = state.isNextSahur ? state.nextDaysTimes : state.response.data;
+  if (!store.prayerTimes || !store.nextDayTimes) return new Date();
+
+  const { timings } = state.isNextSahur ? store.nextDayTimes.data : store.prayerTimes.data;
   const time = timings[name];
   const [hour, minute] = time.split(':');
 
@@ -171,31 +127,10 @@ const getAdhanTime = (name) => {
   return adhanTime;
 };
 
-const formatTimeDiff = (diff) => {
-  const seconds = Math.floor((diff / 1000) % 60);
-  const minutes = Math.floor((diff / 1000 / 60) % 60);
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-
-  return { hours, minutes, seconds };
-};
-
-const timer = () => {
-  const mode = checkTimerMode();
-
-  if (mode === 'sahur') {
-    state.nextTimeLabel = 'sahur';
-    return timeUntilSahur;
-  }
-
-  state.nextTimeLabel = 'iftar';
-  return timeUntilIftar;
-};
-
 const checkTimerMode = () => {
   let timerMode = 'iftar';
 
   const now = new Date();
-
   const iftar = iftarTime.value;
   const sahur = sahurTime.value;
 
@@ -203,7 +138,7 @@ const checkTimerMode = () => {
     timerMode = 'sahur';
   } else if (now > sahur && now < iftar) {
     timerMode = 'iftar';
-  } else if (now > iftar  && now > sahur) {
+  } else if (now > iftar && now > sahur) {
     state.isNextSahur = true;
     timerMode = 'sahur';
   }
@@ -211,12 +146,42 @@ const checkTimerMode = () => {
   return timerMode;
 };
 
-onBeforeUnmount(() => {
-  if (state.intervalId) {
-    clearInterval(state.intervalId);
-    state.intervalId = null;
-  }
+const formattedDate = computed(() => {
+  return dayjs().format('DD MMMM YYYY');
 });
+
+const formattedHijriDate = computed(() => {
+  let hijriDate = null;
+
+  if (store.hijriDate) {
+    const { day, year, month } = store.hijriDate;
+    const monthName = getHijriMonthById(month.number).nameTR;
+
+    hijriDate = `${day} ${monthName} ${year}`;
+  }
+
+  return hijriDate;
+});
+
+const handleSettingsClick = () => {
+  showSettings.value = true;
+};
+
+const handleSettingsClose = () => {
+  showSettings.value = false;
+};
+
+const handleSettingsUpdate = (settings) => {
+  if (settings.showDate !== undefined) {
+    localStorage.setItem('showDate', settings.showDate);
+    showDate.value = settings.showDate;
+  }
+  if (settings.showHijriDate !== undefined) {
+    localStorage.setItem('showHijriDate', settings.showHijriDate);
+    showHijriDate.value = settings.showHijriDate;
+  }
+  emit('updateSettings', settings);
+};
 
 onMounted(() => {
   fetchData();
@@ -224,90 +189,150 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex mt-8">
-    <div v-show="state.isLoading" class="flex flex-col items-center w-full">
-      <span class="loading loading-spinner loading-lg"></span>
-      <div class="mt-4 text-xl">
-        {{ props.city }} için namaz vakitleri yükleniyor...
+  <div class="flex h-5/6 mt-8">
+    <div v-show="store.isLoading" class="flex flex-col items-center justify-center w-full animate-fade-in gap-6">
+      <div class="loading-cycle">
+        <i class="bi bi-sun-fill cycle-icon sun"></i>
+        <i class="bi bi-moon-fill cycle-icon moon"></i>
+        <i class="bi bi-stars cycle-icon stars"></i>
       </div>
+      <div class="text-lg opacity-80">Vakitler yükleniyor...</div>
     </div>
 
-    <div v-show="!state.isLoading" class="basis-full">
-      <div class="flex text-3xl items-center justify-between">
-        <div class="basis-auto">
-          {{ props.city }} için
-          {{ state.nextTimeLabel }}'a
-        </div>
+    <div v-show="!store.isLoading" class="basis-full w-full">
+      <div class="flex flex-col h-full justify-between">
+        <!-- Top: City Info -->
+        <div class="flex justify-center">
+          <div class="basis-auto">
+            <div class="flex items-center justify-center w-full gap-4">
+              <div class="basis-auto">
+                <div class="text-2xl flex items-center gap-4">
+                  <div class="basis-auto">
+                    {{ store.selectedCity }}
+                  </div>
 
-        <div class="basis-auto">
-          <button class="btn btn-circle btn-primary btn-ghost" @click="handleBack">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="flex w-full justify-center my-4">
-        <div class="grid grid-flow-col gap-5 text-center auto-cols-max">
-          <div class="flex flex-col">
-            <span class="countdown countdown-digit">
-              <span id="timer-hours" style="--value:00;" />
-            </span>
-            saat
-          </div>
-
-          <div class="flex flex-col items-center text-7xl">
-            :
-          </div>
-
-          <div class="flex flex-col">
-            <span class="countdown countdown-digit">
-              <span id="timer-minutes" style="--value:00;" />
-            </span>
-            dakika
-          </div>
-
-          <div class="flex flex-col items-center text-7xl">
-            :
-          </div>
-
-          <div class="flex flex-col">
-            <span class="countdown countdown-digit">
-              <span id="timer-seconds" style="--value:00;" />
-            </span>
-            saniye
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-end text-3xl">
-        kaldı
-      </div>
-
-      <div class="flex w-full justify-center mt-12 text-lg">
-        <div class="basis-full">
-          <div v-for="(time, index) in state.times" :key="index" class="flex text-center justify-center">
-            <div class="basis-full">
-              <div class="flex">
-                <div class="basis-1/2 pr-2 text-right">
-                  {{ time.name }}
+                  <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="handleSettingsClick">
+                    <i class="bi bi-gear"></i>
+                  </button>
                 </div>
+              </div>
+            </div>
 
-                <div class="basis-1/2 pl-2 text-left">
-                  {{ time.time }}
-                </div>
+            <div class="flex items-center opacity-70">
+              <div v-if="showDate" class="basis-auto">
+                {{ formattedDate }}
+              </div>
+
+              <div v-if="showHijriDate && formattedHijriDate" class="basis-auto">
+                <template v-if="showDate">
+                  <i class="bi bi-dot"></i>
+                </template>
+                {{ formattedHijriDate }}
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Middle: Counter -->
+        <CountdownTimer
+          v-if="!store.isLoading"
+          :target-time="targetTime"
+          :mode="timerMode"
+        />
+
+        <!-- Bottom: Prayer Times -->
+        <PrayerTimes :times="state.times" />
       </div>
     </div>
+
+    <!-- Settings Modal -->
+    <SettingsPage
+      v-if="showSettings"
+      :current-city="store.selectedCity"
+      :current-theme="props.currentTheme"
+      :show-date="showDate"
+      :show-hijri-date="showHijriDate"
+      :themes="props.themes"
+      @close="handleSettingsClose"
+      @update-settings="handleSettingsUpdate"
+      @refresh="fetchData"
+    />
   </div>
 </template>
 
 <style lang="scss">
-.countdown-digit {
-  @apply text-6xl sm:text-7xl;
+// Add smooth transitions for prayer time items
+.flex-enter-active,
+.flex-leave-active {
+  transition: all 0.3s ease;
+}
+.flex-enter-from,
+.flex-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.bi {
+  font-size: 1.2rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.loading-cycle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cycle-icon {
+  position: absolute;
+  font-size: 3.5rem;
+  color: var(--primary);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  5%, 28% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  33% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.sun {
+  animation: fadeInOut 6s infinite;
+}
+
+.moon {
+  animation: fadeInOut 6s infinite 2s;
+}
+
+.stars {
+  animation: fadeInOut 6s infinite 4s;
 }
 </style>
