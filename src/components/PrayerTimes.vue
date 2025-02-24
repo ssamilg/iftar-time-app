@@ -11,8 +11,7 @@ const props = defineProps({
 const currentTimeIndex = computed(() => {
   const now = new Date();
   const currentTimestamp = now.setHours(now.getHours(), now.getMinutes(), 0, 0);
-
-  let currentIndex = 0;
+  let currentIndex = 2;
 
   props.times.forEach((time, index) => {
     const [hours, minutes] = time.time.split(':');
@@ -26,12 +25,25 @@ const currentTimeIndex = computed(() => {
   return currentIndex;
 });
 
-const getTimeClasses = computed(() => (index) => {
-  return {
-    'prayer-time': true,
-    'prayer-time-current': index === currentTimeIndex.value,
-    'prayer-time-past': index < currentTimeIndex.value
-  };
+const displayTimes = computed(() => {
+  const times = [...props.times];
+
+  if (currentTimeIndex.value === -1) {
+    times.pop();
+    times.unshift({
+      ...props.times[5],
+      name: 'Yatsı',
+      time: 'dün'
+    });
+  }
+
+  return times;
+});
+
+const getTimeClasses = (index) => ({
+  'prayer-time': true,
+  'prayer-time-current': index === currentTimeIndex.value || (index === 0 && currentTimeIndex.value === -1),
+  'prayer-time-past': index < currentTimeIndex.value
 });
 </script>
 
@@ -40,14 +52,14 @@ const getTimeClasses = computed(() => (index) => {
     <div class="basis-full max-w-sm px-4">
       <div class="space-y-1.5">
         <div
-          v-for="(time, index) in times"
+          v-for="(time, index) in displayTimes"
           :key="time.name"
           class="prayer-time-item"
         >
           <div class="flex items-center px-2 py-1.5 rounded" :class="getTimeClasses(index)">
             <div class="prayer-time-name">{{ time.name }}</div>
             <i :class="[time.icon, 'prayer-time-icon']" />
-            <div class="prayer-time-time">{{ time.time }}</div>
+            <div class="prayer-time-time">{{ time.time || '-' }}</div>
           </div>
         </div>
       </div>
