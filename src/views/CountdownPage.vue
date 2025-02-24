@@ -1,29 +1,37 @@
 <script setup>
 import dayjs from 'dayjs';
-import { computed, onMounted, reactive } from 'vue';
+import 'dayjs/locale/tr';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useStore } from '@/stores';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import PrayerTimes from '@/components/PrayerTimes.vue';
+import SettingsPage from '@/views/SettingsPage.vue';
+
+// Set locale to Turkish
+dayjs.locale('tr');
 
 const props = defineProps({
-  city: {
+  currentTheme: {
     type: String,
+    required: true
+  },
+  themes: {
+    type: Array,
     required: true
   }
 });
 
-const emit = defineEmits(['back', 'ready']);
+const emit = defineEmits(['back', 'ready', 'updateSettings']);
+
+const store = useStore();
+const showSettings = ref(false);
+const showDate = ref(localStorage.getItem('showDate') !== 'false');
 
 const state = reactive({
-  response: null,
-  nextDaysTimes: null,
   times: [],
   isNextSahur: false,
   nextTimeLabel: '',
-  isLoading: true
 });
-
-const store = useStore();
 
 const timesTRTranslation = {
   Sunrise: 'Güneş',
@@ -60,33 +68,18 @@ const timerMode = computed(() => {
 
 const fetchData = async () => {
   try {
-    const params = {
-      city: props.city,
-      country: 'Turkey',
-      method: 13,
-    };
-
-    const { data:response } = await store.fetchTimesByCity(params);
-    state.response = response;
-
-    let nextDay = new Date();
-    nextDay.setDate(nextDay.getDate() + 1);
-    nextDay = dayjs(nextDay).format('DD-MM-YYYY');
-
-    const { data:nextDayResponse } = await store.fetchTimesByCityAndDate(nextDay, params);
-    state.nextDaysTimes = nextDayResponse.data;
-
+    await store.fetchAllTimes();
     setAdhanTimeList();
     emit('ready');
   } catch (error) {
     console.error('Error fetching prayer times:', error);
-  } finally {
-    state.isLoading = false;
   }
 };
 
 const setAdhanTimeList = () => {
-  const { timings } = state.response.data;
+  if (!store.prayerTimes) return;
+
+  const { timings } = store.prayerTimes.data;
 
   const adhanTimeList = [
     'Fajr',
@@ -124,7 +117,9 @@ const handleBack = () => {
 };
 
 const getAdhanTime = (name) => {
-  const { timings } = state.isNextSahur ? state.nextDaysTimes : state.response.data;
+  if (!store.prayerTimes || !store.nextDayTimes) return new Date();
+
+  const { timings } = state.isNextSahur ? store.nextDayTimes.data : store.prayerTimes.data;
   const time = timings[name];
   const [hour, minute] = time.split(':');
 
@@ -157,6 +152,22 @@ const formattedDate = computed(() => {
   return dayjs().format('DD MMMM YYYY');
 });
 
+const handleSettingsClick = () => {
+  showSettings.value = true;
+};
+
+const handleSettingsClose = () => {
+  showSettings.value = false;
+};
+
+const handleSettingsUpdate = (settings) => {
+  if (settings.showDate !== undefined) {
+    localStorage.setItem('showDate', settings.showDate);
+    showDate.value = settings.showDate;
+  }
+  emit('updateSettings', settings);
+};
+
 onMounted(() => {
   fetchData();
 });
@@ -164,7 +175,7 @@ onMounted(() => {
 
 <template>
   <div class="flex h-5/6 mt-8">
-    <div v-show="state.isLoading" class="flex flex-col items-center justify-center w-full animate-fade-in gap-6">
+    <div v-show="store.isLoading" class="flex flex-col items-center justify-center w-full animate-fade-in gap-6">
       <div class="loading-cycle">
         <i class="bi bi-sun-fill cycle-icon sun"></i>
         <i class="bi bi-moon-fill cycle-icon moon"></i>
@@ -173,23 +184,24 @@ onMounted(() => {
       <div class="text-lg opacity-80">Vakitler yükleniyor...</div>
     </div>
 
-    <div v-show="!state.isLoading" class="basis-full w-full">
+    <div v-show="!store.isLoading" class="basis-full w-full">
       <div class="flex flex-col h-full justify-between">
         <!-- Top: City Info -->
         <div class="flex justify-center">
           <div class="basis-auto">
             <div class="flex items-center gap-4">
               <div class="text-2xl flex items-center gap-4">
-                {{ props.city }}
-                <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="handleBack">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                  </svg>
+                <div class="basis-auto">
+                  {{ store.selectedCity }}
+                </div>
+
+                <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="handleSettingsClick">
+                  <i class="bi bi-gear"></i>
                 </button>
               </div>
             </div>
 
-            <div class="flex">
+            <div class="flex" v-if="showDate">
               <div class="text-base opacity-70">{{ formattedDate }}</div>
             </div>
           </div>
@@ -197,7 +209,7 @@ onMounted(() => {
 
         <!-- Middle: Counter -->
         <CountdownTimer
-          v-if="!state.isLoading"
+          v-if="!store.isLoading"
           :target-time="targetTime"
           :mode="timerMode"
         />
@@ -206,6 +218,18 @@ onMounted(() => {
         <PrayerTimes :times="state.times" />
       </div>
     </div>
+
+    <!-- Settings Modal -->
+    <SettingsPage
+      v-if="showSettings"
+      :current-city="store.selectedCity"
+      :current-theme="props.currentTheme"
+      :show-date="showDate"
+      :themes="props.themes"
+      @close="handleSettingsClose"
+      @update-settings="handleSettingsUpdate"
+      @refresh="fetchData"
+    />
   </div>
 </template>
 
@@ -222,7 +246,7 @@ onMounted(() => {
 }
 
 .bi {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 @keyframes fadeIn {

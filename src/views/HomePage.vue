@@ -48,6 +48,17 @@ const handleStart = (selectedCity) => {
   showCountdown.value = true;
 };
 
+const handleSettingsUpdate = (settings) => {
+  if (settings.city) {
+    city.value = settings.city;
+    localStorage.setItem('selectedCity', settings.city);
+  }
+
+  if (settings.theme) {
+    handleThemeChange({ target: { value: settings.theme } });
+  }
+};
+
 onMounted(() => {
   const html = document.querySelector('html');
   const savedTheme = localStorage.getItem('selectedTheme') || DEFAULT_THEME;
@@ -76,23 +87,14 @@ onMounted(() => {
       <CountdownPage
         v-else
         :city="city"
+        :current-theme="currentTheme"
+        :themes="themes"
         @back="handleBack"
+        @update-settings="handleSettingsUpdate"
       />
     </div>
 
-    <div class="absolute bottom-0 text-center text-primary flex flex-col gap-4">
-      <div class="flex gap-2 items-center">
-        <select
-          class="select select-bordered select-sm w-32"
-          :value="currentTheme"
-          @change="handleThemeChange"
-        >
-          <option v-for="theme in themes" :key="theme.value" :value="theme.value">
-            {{ theme.label }}
-          </option>
-        </select>
-      </div>
-
+    <div class="absolute bottom-0 text-center text-primary flex flex-col gap-4 pb-4">
       <a href="https://ssamilg.dev">
         SSG
       </a>
