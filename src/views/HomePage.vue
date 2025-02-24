@@ -11,7 +11,7 @@ const currentTheme = ref(localStorage.getItem('selectedTheme') || DEFAULT_THEME)
 const themes = [
   { value: 'light', label: 'Modern', font: 'Inter' },
   { value: 'dark', label: 'Dark', font: 'Roboto' },
-  { value: 'islamic', label: 'Islamic', font: 'Noto Naskh Arabic' },
+  { value: 'islamic', label: 'Islamic', font: 'Aref Ruqaa' },
   { value: 'ottoman', label: 'Ottoman', font: 'Mirza' },
   { value: 'seljuk', label: 'Seljuk', font: 'Kavivanar' },
   { value: 'digital', label: 'Digital', font: 'VT323' },
