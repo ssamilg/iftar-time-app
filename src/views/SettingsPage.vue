@@ -130,39 +130,41 @@ const handleThemeChange = (theme) => {
           </div>
         </div>
 
-        <!-- API Disclaimer -->
-        <div class="card bg-base-200">
-          <div class="card-body p-3">
-            <p class="text-xs opacity-70">
-              Namaz vakitleri
-              <a
-                href="https://aladhan.com/prayer-times-api"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="link link-primary"
-              >
-                Aladhan API
-              </a> tarafından sağlanmaktadır. Vakitler resmi kaynaklardan farklılık gösterebilir.
-            </p>
-          </div>
-        </div>
+        <div class="div">
+           <!-- API Disclaimer -->
+           <div class="card bg-base-200">
+             <div class="card-body p-3">
+               <p class="text-xs opacity-70">
+                 Namaz vakitleri
+                 <a
+                   href="https://aladhan.com/prayer-times-api"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="link link-primary"
+                 >
+                   Aladhan API
+                 </a> tarafından sağlanmaktadır. Vakitler resmi kaynaklardan farklılık gösterebilir.
+               </p>
+             </div>
+           </div>
 
-        <!-- GitHub Link -->
-        <div class="card bg-base-200">
-          <div class="card-body p-3">
-            <p class="text-xs opacity-70">
-              Bu proje açık kaynaklıdır. Kaynak kodlarına
-              <a
-                href="https://github.com/ssamilg/iftar-time-app"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="link link-primary"
-              >
-                GitHub
-              </a> üzerinden ulaşabilirsiniz.
-            </p>
-          </div>
-        </div>
+           <!-- GitHub Link -->
+           <div class="card bg-base-200 mt-2">
+             <div class="card-body p-3">
+               <p class="text-xs opacity-70">
+                 Bu proje açık kaynaklıdır. Kaynak kodlarına
+                 <a
+                   href="https://github.com/ssamilg/iftar-time-app"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="link link-primary"
+                 >
+                   GitHub
+                 </a> üzerinden ulaşabilirsiniz.
+               </p>
+             </div>
+           </div>
+         </div>
 
         <!-- Save Button -->
         <div class="flex justify-end">
