@@ -8,6 +8,7 @@ export const useStore = defineStore('index', {
     prayerTimes: null,
     nextDayTimes: null,
     isLoading: false,
+    hijriDate: null,
   }),
 
   actions: {
@@ -25,7 +26,9 @@ export const useStore = defineStore('index', {
             city: this.selectedCity
           }
         });
+
         this.prayerTimes = response;
+        this.hijriDate = response?.data?.date?.hijri;
         return { data: response };
       } catch (error) {
         console.error('Error fetching prayer times:', error);

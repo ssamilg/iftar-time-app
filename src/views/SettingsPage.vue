@@ -14,7 +14,11 @@ const props = defineProps({
   },
   showDate: {
     type: Boolean,
-    default: true
+    required: true
+  },
+  showHijriDate: {
+    type: Boolean,
+    required: true
   },
   themes: {
     type: Array,
@@ -28,11 +32,13 @@ const emit = defineEmits(['close', 'updateSettings', 'refresh']);
 const selectedCity = ref(props.currentCity);
 const selectedTheme = ref(props.currentTheme);
 const showDateToggle = ref(props.showDate);
+const showHijriDateToggle = ref(props.showHijriDate);
 const showCitySelector = ref(false);
 
 const handleSave = () => {
   const settings = {
-    showDate: showDateToggle.value
+    showDate: showDateToggle.value,
+    showHijriDate: showHijriDateToggle.value
   };
 
   if (selectedCity.value !== props.currentCity) {
@@ -90,13 +96,17 @@ const handleThemeChange = (theme) => {
 
         <!-- Show Date Toggle -->
         <div class="form-control">
-          <label class="label py-1 cursor-pointer justify-between">
+          <label class="label cursor-pointer justify-start gap-4">
             <span class="label-text">Tarih Göster</span>
-            <input
-              type="checkbox"
-              class="toggle toggle-primary toggle-sm"
-              v-model="showDateToggle"
-            />
+            <input type="checkbox" class="toggle toggle-primary" v-model="showDateToggle" />
+          </label>
+        </div>
+
+        <!-- Hijri Date Toggle -->
+        <div class="form-control !mt-0">
+          <label class="label cursor-pointer justify-start gap-4">
+            <span class="label-text">Hicri Tarih Göster</span>
+            <input type="checkbox" class="toggle toggle-primary" v-model="showHijriDateToggle" />
           </label>
         </div>
 

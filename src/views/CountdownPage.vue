@@ -6,6 +6,7 @@ import { useStore } from '@/stores';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import PrayerTimes from '@/components/PrayerTimes.vue';
 import SettingsPage from '@/views/SettingsPage.vue';
+import { getHijriMonthById } from '@/constants/hijriMonths';
 
 // Set locale to Turkish
 dayjs.locale('tr');
@@ -26,6 +27,7 @@ const emit = defineEmits(['back', 'ready', 'updateSettings']);
 const store = useStore();
 const showSettings = ref(false);
 const showDate = ref(localStorage.getItem('showDate') !== 'false');
+const showHijriDate = ref(localStorage.getItem('showHijriDate') !== 'false');
 
 const state = reactive({
   times: [],
@@ -112,10 +114,6 @@ const setAdhanTimeList = () => {
   });
 };
 
-const handleBack = () => {
-  emit('back');
-};
-
 const getAdhanTime = (name) => {
   if (!store.prayerTimes || !store.nextDayTimes) return new Date();
 
@@ -152,6 +150,19 @@ const formattedDate = computed(() => {
   return dayjs().format('DD MMMM YYYY');
 });
 
+const formattedHijriDate = computed(() => {
+  let hijriDate = null;
+
+  if (store.hijriDate) {
+    const { day, year, month } = store.hijriDate;
+    const monthName = getHijriMonthById(month.number).nameTR;
+
+    hijriDate = `${day} ${monthName} ${year}`;
+  }
+
+  return hijriDate;
+});
+
 const handleSettingsClick = () => {
   showSettings.value = true;
 };
@@ -164,6 +175,10 @@ const handleSettingsUpdate = (settings) => {
   if (settings.showDate !== undefined) {
     localStorage.setItem('showDate', settings.showDate);
     showDate.value = settings.showDate;
+  }
+  if (settings.showHijriDate !== undefined) {
+    localStorage.setItem('showHijriDate', settings.showHijriDate);
+    showHijriDate.value = settings.showHijriDate;
   }
   emit('updateSettings', settings);
 };
@@ -189,20 +204,31 @@ onMounted(() => {
         <!-- Top: City Info -->
         <div class="flex justify-center">
           <div class="basis-auto">
-            <div class="flex items-center gap-4">
-              <div class="text-2xl flex items-center gap-4">
-                <div class="basis-auto">
-                  {{ store.selectedCity }}
-                </div>
+            <div class="flex items-center justify-center w-full gap-4">
+              <div class="basis-auto">
+                <div class="text-2xl flex items-center gap-4">
+                  <div class="basis-auto">
+                    {{ store.selectedCity }}
+                  </div>
 
-                <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="handleSettingsClick">
-                  <i class="bi bi-gear"></i>
-                </button>
+                  <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="handleSettingsClick">
+                    <i class="bi bi-gear"></i>
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div class="flex" v-if="showDate">
-              <div class="text-base opacity-70">{{ formattedDate }}</div>
+            <div class="flex items-center opacity-70">
+              <div v-if="showDate" class="basis-auto">
+                {{ formattedDate }}
+              </div>
+
+              <div v-if="showHijriDate && formattedHijriDate" class="basis-auto">
+                <template v-if="showDate">
+                  <i class="bi bi-dot"></i>
+                </template>
+                {{ formattedHijriDate }}
+              </div>
             </div>
           </div>
         </div>
@@ -225,6 +251,7 @@ onMounted(() => {
       :current-city="store.selectedCity"
       :current-theme="props.currentTheme"
       :show-date="showDate"
+      :show-hijri-date="showHijriDate"
       :themes="props.themes"
       @close="handleSettingsClose"
       @update-settings="handleSettingsUpdate"
