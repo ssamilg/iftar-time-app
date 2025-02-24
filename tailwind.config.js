@@ -38,7 +38,7 @@ export default {
         },
         seljuk: {
           "base-100": "#006D7C",   /* Rich blue-turquoise - that sweet spot between dark blue and turquoise */
-          "base-200": "#7C6755",  /* Warm earthy brown that complements the turquoise while adding warmth */
+          "base-200": "#003B44",  /* Darker blue-turquoise for gradient depth */
           "primary": "#FFFFFF",  /* Pure white like the flag */
         },
         digital: {
