@@ -41,6 +41,17 @@ export default {
           "base-200": "#7C6755",  /* Warm earthy brown that complements the turquoise while adding warmth */
           "primary": "#FFFFFF",  /* Pure white like the flag */
         },
+        digital: {
+          "base-100": "#000000",  /* Deep black background */
+          "base-200": "#1a1a1a",  /* Slightly lighter black for gradient */
+          "primary": "#00FF00",   /* Classic LCD green */
+        },
+        ssg: {
+          "base-100": "#18181B",  /* Zinc-900 background */
+          "base-200": "#1F2937",  /* Gray-800 for gradient */
+          "primary": "#F1F5F9",   /* Slate-100 for content */
+          "--primary-content": "#3B82F6",  /* Blue-500 for UI elements */
+        },
       },
     ],
   },

@@ -16,6 +16,8 @@ const themes = [
   { value: 'islamic', label: 'Islamic', font: 'Noto Naskh Arabic' },
   { value: 'ottoman', label: 'Ottoman', font: 'Mirza' },
   { value: 'seljuk', label: 'Seljuk', font: 'Kavivanar' },
+  { value: 'digital', label: 'Digital', font: 'VT323' },
+  { value: 'ssg', label: 'SSG', font: 'Poppins' },
 ];
 
 const filteredCities = computed(() => {
@@ -204,6 +206,35 @@ body.theme-transitioning {
 
   .dropdown-content {
     @apply bg-opacity-90;
+    backdrop-filter: blur(8px);
+  }
+}
+
+[data-theme='digital'] {
+  .input, .select, .btn {
+    text-shadow: 0 0 5px currentColor;
+    @apply border-primary border-opacity-50;
+  }
+
+  .dropdown-content {
+    @apply bg-opacity-90 border border-primary border-opacity-30;
+    backdrop-filter: blur(8px);
+  }
+}
+
+[data-theme='ssg'] {
+  .input, .select, .btn {
+    @apply bg-base-200 border-[--primary-content] border-opacity-30;
+    transition: border-opacity 0.2s ease;
+    color: var(--primary-content);
+
+    &:hover, &:focus {
+      @apply border-opacity-100;
+    }
+  }
+
+  .dropdown-content {
+    @apply bg-base-200 border-[--primary-content] border-opacity-20;
     backdrop-filter: blur(8px);
   }
 }
