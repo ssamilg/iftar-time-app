@@ -70,7 +70,7 @@ const getTimeClasses = (index) => ({
 <style lang="scss">
 .prayer-time {
   &-name {
-    @apply flex-1 font-medium text-primary/80 text-right;
+    @apply flex-1 font-medium text-primary/80 text-right text-base;
   }
 
   &-icon {
@@ -78,25 +78,31 @@ const getTimeClasses = (index) => ({
   }
 
   &-time {
-    @apply flex-1 tabular-nums text-primary/80 text-left;
+    @apply flex-1 tabular-nums text-primary/80 text-left text-base;
   }
 
   &-current {
-    @apply bg-primary/10 text-lg;
+    @apply bg-primary/10;
 
     .prayer-time-name,
     .prayer-time-time,
     .prayer-time-icon {
-      @apply text-primary;
+      @apply text-primary text-xl;
     }
 
     .prayer-time-icon {
-      @apply text-xl;
+      @apply text-2xl;
     }
   }
 
   &-past {
-    @apply opacity-40 text-sm;
+    @apply opacity-40 text-base;
+
+    .prayer-time-name,
+    .prayer-time-time,
+    .prayer-time-icon {
+      @apply text-sm;
+    }
   }
 }
 </style>
