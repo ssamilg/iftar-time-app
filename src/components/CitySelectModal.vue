@@ -70,7 +70,7 @@ const handleSelect = (cityName) => {
           type="text"
           v-model="searchQuery"
           placeholder="Şehir ara..."
-          class="input input-bordered input-sm w-full bg-primary/10"
+          class="input input-bordered input-sm w-full bg-primary/10 text-base"
           autofocus
         />
       </div>

@@ -66,7 +66,7 @@ const handleThemeChange = (theme) => {
 
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-    <div class="bg-base-100 p-4 rounded-lg shadow-xl w-full max-w-lg mx-4">
+    <div class="bg-base-100 p-4 rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90dvh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Ayarlar</h2>
         <button class="btn btn-circle btn-ghost btn-sm" @click="handleClose">
