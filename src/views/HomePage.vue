@@ -73,7 +73,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="relative flex h-screen w-full justify-center home-page"
+    class="relative flex h-dvh w-full justify-center home-page"
     :style="{ fontFamily: currentFont }"
   >
     <ThemePatterns :theme="currentTheme" />
