@@ -47,7 +47,7 @@ const handleSelect = (cityName) => {
 <template>
   <div
     v-if="show"
-    class="fixed inset-0 bg-base-100 z-50 flex flex-col"
+    class="fixed inset-0 bg-base-100 z-50 flex flex-col max-w-lg mx-auto"
   >
     <div class="p-3 border-b border-base-200 flex items-center gap-3">
       <button
@@ -70,7 +70,7 @@ const handleSelect = (cityName) => {
           type="text"
           v-model="searchQuery"
           placeholder="Şehir ara..."
-          class="input input-bordered input-sm w-full bg-primary/10"
+          class="input input-bordered input-sm w-full bg-primary/10 text-base"
           autofocus
         />
       </div>
