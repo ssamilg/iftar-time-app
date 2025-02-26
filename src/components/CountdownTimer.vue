@@ -103,7 +103,7 @@ onBeforeUnmount(() => {
   <div class="flex justify-center">
     <div class="basis-auto">
       <div class="timer-title">
-        {{ mode === 'iftar' ? 'İftara' : 'Sahura' }}
+        {{ mode === 'iftar' ? 'İftara' : 'İmsak Vaktine' }}
       </div>
 
       <div class="flex items-end gap-2">
