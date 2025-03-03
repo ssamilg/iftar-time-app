@@ -28,6 +28,7 @@ const store = useStore();
 const showSettings = ref(false);
 const showDate = ref(localStorage.getItem('showDate') !== 'false');
 const showHijriDate = ref(localStorage.getItem('showHijriDate') !== 'false');
+const hideSeconds = ref(localStorage.getItem('hideSeconds') === 'true');
 
 const state = reactive({
   times: [],
@@ -180,6 +181,10 @@ const handleSettingsUpdate = (settings) => {
     localStorage.setItem('showHijriDate', settings.showHijriDate);
     showHijriDate.value = settings.showHijriDate;
   }
+  if (settings.hideSeconds !== undefined) {
+    localStorage.setItem('hideSeconds', settings.hideSeconds);
+    hideSeconds.value = settings.hideSeconds;
+  }
   emit('updateSettings', settings);
 };
 
@@ -238,6 +243,7 @@ onMounted(() => {
           v-if="!store.isLoading"
           :target-time="targetTime"
           :mode="timerMode"
+          :hide-seconds="hideSeconds"
           @timer-complete="fetchData"
         />
 
@@ -253,6 +259,7 @@ onMounted(() => {
       :current-theme="props.currentTheme"
       :show-date="showDate"
       :show-hijri-date="showHijriDate"
+      :hide-seconds="hideSeconds"
       :themes="props.themes"
       @close="handleSettingsClose"
       @update-settings="handleSettingsUpdate"

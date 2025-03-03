@@ -9,6 +9,10 @@ const props = defineProps({
   mode: {
     type: String,
     required: true
+  },
+  hideSeconds: {
+    type: Boolean,
+    required: true
   }
 });
 
@@ -24,6 +28,7 @@ const display = computed(() => {
   const result = {
     showHours: false,
     showMinutes: true,
+    showSeconds: !props.hideSeconds || (hours.value === 0 && minutes.value === 0),
     hourClass: 'countdown countdown-digit',
     minuteClass: 'countdown countdown-digit',
     secondClass: 'countdown countdown-digit-small',
@@ -117,10 +122,12 @@ onBeforeUnmount(() => {
           <div :class="display.labelClass">dk</div>
         </template>
 
-        <div :class="display.secondClass">
-          <div :style="{ '--value': seconds }" />
-        </div>
-        <div :class="display.secondLabelClass">sn</div>
+        <template v-if="display.showSeconds">
+          <div :class="display.secondClass">
+            <div :style="{ '--value': seconds }" />
+          </div>
+          <div :class="display.secondLabelClass">sn</div>
+        </template>
       </div>
     </div>
   </div>
