@@ -53,9 +53,15 @@ const calculateTimeDiff = () => {
   const now = new Date();
   const diff = props.targetTime - now;
 
-  hours.value = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  minutes.value = Math.floor((diff / 1000 / 60) % 60);
-  seconds.value = Math.floor((diff / 1000) % 60);
+  if (diff <= 0) {
+    hours.value = 0;
+    minutes.value = 0;
+    seconds.value = 0;
+  } else {
+    hours.value = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    minutes.value = Math.floor((diff / 1000 / 60) % 60);
+    seconds.value = Math.floor((diff / 1000) % 60);
+  }
 };
 
 const startCounter = () => {
@@ -65,26 +71,7 @@ const startCounter = () => {
   }
 
   calculateTimeDiff();
-
-  intervalId = setInterval(() => {
-    if (seconds.value > 0) {
-      seconds.value--;
-    } else {
-      seconds.value = 59;
-
-      if (minutes.value === 0) {
-        if (hours.value === 0) {
-          // Timer has reached zero
-          calculateTimeDiff();
-        } else {
-          hours.value--;
-          minutes.value = 59;
-        }
-      } else {
-        minutes.value--;
-      }
-    }
-  }, 1000);
+  intervalId = setInterval(calculateTimeDiff, 1000);
 };
 
 watch(() => props.targetTime, () => {
