@@ -116,14 +116,21 @@ const setAdhanTimeList = () => {
 };
 
 const getAdhanTime = (name) => {
-  if (!store.prayerTimes || !store.nextDayTimes) return new Date();
+  let adhanTime = new Date();
 
-  const { timings } = state.isNextSahur ? store.nextDayTimes.data : store.prayerTimes.data;
-  const time = timings[name];
-  const [hour, minute] = time.split(':');
+  if (store.prayerTimes && store.nextDayTimes) {
+    const { timings } = state.isNextSahur ? store.nextDayTimes.data : store.prayerTimes.data;
+    const time = timings[name];
+    const [hour, minute] = time.split(':');
 
-  const now = new Date();
-  const adhanTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
+    const now = new Date();
+    adhanTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
+
+    // Apply 1-minute correction to Maghrib (iftar) time
+    if (name === 'Maghrib') {
+      adhanTime.setMinutes(adhanTime.getMinutes() - 1);
+    }
+  }
 
   return adhanTime;
 };
