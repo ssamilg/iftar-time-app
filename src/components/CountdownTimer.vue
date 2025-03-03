@@ -12,10 +12,13 @@ const props = defineProps({
   }
 });
 
+const emit = defineEmits(['timerComplete']);
+
 const hours = ref(0);
 const minutes = ref(0);
 const seconds = ref(0);
 let intervalId = null;
+let lastDiff = null;
 
 const display = computed(() => {
   const result = {
@@ -57,11 +60,17 @@ const calculateTimeDiff = () => {
     hours.value = 0;
     minutes.value = 0;
     seconds.value = 0;
+
+    if (lastDiff > 0) {
+      emit('timerComplete');
+    }
   } else {
     hours.value = Math.floor((diff / (1000 * 60 * 60)) % 24);
     minutes.value = Math.floor((diff / 1000 / 60) % 60);
     seconds.value = Math.floor((diff / 1000) % 60);
   }
+
+  lastDiff = diff;
 };
 
 const startCounter = () => {

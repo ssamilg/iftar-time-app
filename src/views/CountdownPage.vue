@@ -238,6 +238,7 @@ onMounted(() => {
           v-if="!store.isLoading"
           :target-time="targetTime"
           :mode="timerMode"
+          @timer-complete="fetchData"
         />
 
         <!-- Bottom: Prayer Times -->
