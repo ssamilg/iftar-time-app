@@ -9,18 +9,26 @@ const props = defineProps({
   mode: {
     type: String,
     required: true
+  },
+  hideSeconds: {
+    type: Boolean,
+    required: true
   }
 });
+
+const emit = defineEmits(['timerComplete']);
 
 const hours = ref(0);
 const minutes = ref(0);
 const seconds = ref(0);
 let intervalId = null;
+let lastDiff = null;
 
 const display = computed(() => {
   const result = {
     showHours: false,
     showMinutes: true,
+    showSeconds: !props.hideSeconds || (hours.value === 0 && minutes.value === 0),
     hourClass: 'countdown countdown-digit',
     minuteClass: 'countdown countdown-digit',
     secondClass: 'countdown countdown-digit-small',
@@ -53,9 +61,21 @@ const calculateTimeDiff = () => {
   const now = new Date();
   const diff = props.targetTime - now;
 
-  hours.value = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  minutes.value = Math.floor((diff / 1000 / 60) % 60);
-  seconds.value = Math.floor((diff / 1000) % 60);
+  if (diff <= 0) {
+    hours.value = 0;
+    minutes.value = 0;
+    seconds.value = 0;
+
+    if (lastDiff > 0) {
+      emit('timerComplete');
+    }
+  } else {
+    hours.value = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    minutes.value = Math.floor((diff / 1000 / 60) % 60);
+    seconds.value = Math.floor((diff / 1000) % 60);
+  }
+
+  lastDiff = diff;
 };
 
 const startCounter = () => {
@@ -65,26 +85,7 @@ const startCounter = () => {
   }
 
   calculateTimeDiff();
-
-  intervalId = setInterval(() => {
-    if (seconds.value > 0) {
-      seconds.value--;
-    } else {
-      seconds.value = 59;
-
-      if (minutes.value === 0) {
-        if (hours.value === 0) {
-          // Timer has reached zero
-          calculateTimeDiff();
-        } else {
-          hours.value--;
-          minutes.value = 59;
-        }
-      } else {
-        minutes.value--;
-      }
-    }
-  }, 1000);
+  intervalId = setInterval(calculateTimeDiff, 1000);
 };
 
 watch(() => props.targetTime, () => {
@@ -121,10 +122,12 @@ onBeforeUnmount(() => {
           <div :class="display.labelClass">dk</div>
         </template>
 
-        <div :class="display.secondClass">
-          <div :style="{ '--value': seconds }" />
-        </div>
-        <div :class="display.secondLabelClass">sn</div>
+        <template v-if="display.showSeconds">
+          <div :class="display.secondClass">
+            <div :style="{ '--value': seconds }" />
+          </div>
+          <div :class="display.secondLabelClass">sn</div>
+        </template>
       </div>
     </div>
   </div>

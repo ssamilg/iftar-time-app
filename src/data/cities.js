@@ -1,6 +1,7 @@
 export const cities = [
   { id: 6, name: 'Ankara' },
   { id: 34, name: 'İstanbul' },
+  { id: 35, name: 'İzmir' },
   { id: 1, name: 'Adana' },
   { id: 2, name: 'Adıyaman' },
   { id: 3, name: 'Afyonkarahisar' },
@@ -33,7 +34,6 @@ export const cities = [
   { id: 31, name: 'Hatay' },
   { id: 32, name: 'Isparta' },
   { id: 33, name: 'Mersin' },
-  { id: 35, name: 'İzmir' },
   { id: 36, name: 'Kars' },
   { id: 37, name: 'Kastamonu' },
   { id: 38, name: 'Kayseri' },

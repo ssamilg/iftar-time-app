@@ -28,6 +28,7 @@ const store = useStore();
 const showSettings = ref(false);
 const showDate = ref(localStorage.getItem('showDate') !== 'false');
 const showHijriDate = ref(localStorage.getItem('showHijriDate') !== 'false');
+const hideSeconds = ref(localStorage.getItem('hideSeconds') === 'true');
 
 const state = reactive({
   times: [],
@@ -115,14 +116,21 @@ const setAdhanTimeList = () => {
 };
 
 const getAdhanTime = (name) => {
-  if (!store.prayerTimes || !store.nextDayTimes) return new Date();
+  let adhanTime = new Date();
 
-  const { timings } = state.isNextSahur ? store.nextDayTimes.data : store.prayerTimes.data;
-  const time = timings[name];
-  const [hour, minute] = time.split(':');
+  if (store.prayerTimes && store.nextDayTimes) {
+    const { timings } = state.isNextSahur ? store.nextDayTimes.data : store.prayerTimes.data;
+    const time = timings[name];
+    const [hour, minute] = time.split(':');
 
-  const now = new Date();
-  const adhanTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
+    const now = new Date();
+    adhanTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
+
+    // Apply 1-minute correction to Maghrib (iftar) time
+    if (name === 'Maghrib') {
+      adhanTime.setMinutes(adhanTime.getMinutes() - 1);
+    }
+  }
 
   return adhanTime;
 };
@@ -179,6 +187,10 @@ const handleSettingsUpdate = (settings) => {
   if (settings.showHijriDate !== undefined) {
     localStorage.setItem('showHijriDate', settings.showHijriDate);
     showHijriDate.value = settings.showHijriDate;
+  }
+  if (settings.hideSeconds !== undefined) {
+    localStorage.setItem('hideSeconds', settings.hideSeconds);
+    hideSeconds.value = settings.hideSeconds;
   }
   emit('updateSettings', settings);
 };
@@ -238,6 +250,8 @@ onMounted(() => {
           v-if="!store.isLoading"
           :target-time="targetTime"
           :mode="timerMode"
+          :hide-seconds="hideSeconds"
+          @timer-complete="fetchData"
         />
 
         <!-- Bottom: Prayer Times -->
@@ -252,6 +266,7 @@ onMounted(() => {
       :current-theme="props.currentTheme"
       :show-date="showDate"
       :show-hijri-date="showHijriDate"
+      :hide-seconds="hideSeconds"
       :themes="props.themes"
       @close="handleSettingsClose"
       @update-settings="handleSettingsUpdate"

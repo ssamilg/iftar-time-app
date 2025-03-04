@@ -20,6 +20,10 @@ const props = defineProps({
     type: Boolean,
     required: true
   },
+  hideSeconds: {
+    type: Boolean,
+    required: true
+  },
   themes: {
     type: Array,
     required: true
@@ -33,12 +37,14 @@ const selectedCity = ref(props.currentCity);
 const selectedTheme = ref(props.currentTheme);
 const showDateToggle = ref(props.showDate);
 const showHijriDateToggle = ref(props.showHijriDate);
+const hideSecondsToggle = ref(props.hideSeconds);
 const showCitySelector = ref(false);
 
 const handleSave = () => {
   const settings = {
     showDate: showDateToggle.value,
-    showHijriDate: showHijriDateToggle.value
+    showHijriDate: showHijriDateToggle.value,
+    hideSeconds: hideSecondsToggle.value
   };
 
   if (selectedCity.value !== props.currentCity) {
@@ -107,6 +113,14 @@ const handleThemeChange = (theme) => {
           <label class="label cursor-pointer justify-start gap-4">
             <span class="label-text">Hicri Tarih Göster</span>
             <input type="checkbox" class="toggle toggle-primary" v-model="showHijriDateToggle" />
+          </label>
+        </div>
+
+        <!-- Hide Seconds Toggle -->
+        <div class="form-control !mt-0">
+          <label class="label cursor-pointer justify-start gap-4">
+            <span class="label-text">Saniye Sayacını Gizle</span>
+            <input type="checkbox" class="toggle toggle-primary" v-model="hideSecondsToggle" />
           </label>
         </div>
 
