@@ -49,6 +49,7 @@ const handleSave = () => {
 
   if (selectedCity.value !== props.currentCity) {
     store.setSelectedCity(selectedCity.value);
+    localStorage.setItem('selectedCity', selectedCity.value);
     emit('refresh');
   }
 

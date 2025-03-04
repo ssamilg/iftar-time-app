@@ -3,7 +3,9 @@ import { ref, computed, onMounted } from 'vue';
 import CountdownPage from './CountdownPage.vue';
 import ThemePatterns from '../components/ThemePatterns.vue';
 import CitySelector from '../components/CitySelector.vue';
+import { useStore } from '@/stores';
 
+const store = useStore();
 const DEFAULT_THEME = 'islamic';
 const city = ref(localStorage.getItem('selectedCity') || 'Ankara');
 const showCountdown = ref(false);
@@ -59,11 +61,19 @@ const handleSettingsUpdate = (settings) => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   const html = document.querySelector('html');
   const savedTheme = localStorage.getItem('selectedTheme') || DEFAULT_THEME;
   currentTheme.value = savedTheme;
   html.setAttribute('data-theme', savedTheme);
+
+  try {
+    const selectedCountry = localStorage.getItem('selectedCountry') || 'Turkey';
+    await store.fetchAllCountries();
+    await store.fetchCitiesByCountry(selectedCountry);
+  } catch (error) {
+    console.error('Failed to load initial data:', error);
+  }
 
   if (localStorage.getItem('selectedCity')) {
     showCountdown.value = true;

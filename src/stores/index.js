@@ -9,14 +9,16 @@ export const useStore = defineStore('index', {
     nextDayTimes: null,
     isLoading: false,
     hijriDate: null,
+    countries: [],
+    cities: []
   }),
-
   actions: {
     setSelectedCity(city) {
       this.selectedCity = city;
-      localStorage.setItem('selectedCity', city);
     },
-
+    getCountryByName(countryName) {
+      return this.countries.find(country => country.country === countryName);
+    },
     async fetchTimesByCity(params) {
       this.isLoading = true;
       try {
@@ -35,7 +37,6 @@ export const useStore = defineStore('index', {
         throw error;
       }
     },
-
     async fetchTimesByCityAndDate(date, params) {
       try {
         const { data: response } = await axios.get(`timingsByCity/${date}`, {
@@ -53,11 +54,12 @@ export const useStore = defineStore('index', {
         this.isLoading = false;
       }
     },
-
     async fetchAllTimes() {
       try {
+        const selectedCountry = localStorage.getItem('selectedCountry') || 'Turkey';
+
         const params = {
-          country: 'Turkey',
+          country: selectedCountry,
           method: 13,
         };
 
@@ -75,6 +77,53 @@ export const useStore = defineStore('index', {
         };
       } catch (error) {
         console.error('Error fetching all times:', error);
+        throw error;
+      }
+    },
+    async fetchAllCountries() {
+      try {
+        const { data: response } = await axios.get("https://countriesnow.space/api/v0.1/countries");
+        let countries = response.data;
+
+        const priorityCountries = ['Turkey', 'Germany', 'United States'];
+
+        priorityCountries.forEach(country => {
+          const countryData = countries.find(c => c.country === country);
+
+          if (countryData) {
+            countries.splice(countries.indexOf(countryData), 1);
+            countries.unshift(countryData);
+          }
+        });
+
+        this.countries = countries;
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+        throw error;
+      }
+    },
+    async fetchCitiesByCountry(country) {
+      try {
+        const countryData = this.getCountryByName(country);
+        if (countryData) {
+          let cities = countryData.cities || [];
+
+          if (country === 'Turkey') {
+            const priorityCities = ['İzmir', 'İstanbul', 'Ankara'];
+
+            priorityCities.forEach(city => {
+              const cityIndex = cities.findIndex(c => c === city);
+              const cityItem = cities[cityIndex];
+
+              cities.splice(cityIndex, 1);
+              cities.unshift(cityItem);
+            });
+          }
+
+          this.cities = cities;
+        }
+      } catch (error) {
+        console.error('Error fetching cities:', error);
         throw error;
       }
     }

@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useStore } from '@/stores';
 import CitySelectModal from './CitySelectModal.vue';
 
 const props = defineProps({
@@ -11,11 +12,13 @@ const props = defineProps({
 
 const emit = defineEmits(['start']);
 
+const store = useStore();
 const city = ref(localStorage.getItem('selectedCity') || 'Ankara');
 const showModal = ref(false);
 
 const startCountdown = () => {
   localStorage.setItem('selectedCity', city.value);
+  store.setSelectedCity(city.value);
   emit('start', city.value);
 };
 
