@@ -125,11 +125,6 @@ const getAdhanTime = (name) => {
 
     const now = new Date();
     adhanTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
-
-    // Apply 1-minute correction to Maghrib (iftar) time
-    if (name === 'Maghrib') {
-      adhanTime.setMinutes(adhanTime.getMinutes() - 1);
-    }
   }
 
   return adhanTime;
