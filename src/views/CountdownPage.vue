@@ -45,6 +45,10 @@ const timesTRTranslation = {
   Isha: 'Yatsı',
 };
 
+const displayCity = computed(() => {
+  return props.currentTheme === 'dune' ? 'Arrakis' : store.selectedCity;
+});
+
 const iftarTime = computed(() => {
   return getAdhanTime('Maghrib');
 });
@@ -215,7 +219,7 @@ onMounted(() => {
               <div class="basis-auto">
                 <div class="text-2xl flex items-center gap-4">
                   <div class="basis-auto">
-                    {{ store.selectedCity }}
+                    {{ displayCity }}
                   </div>
 
                   <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="handleSettingsClick">
