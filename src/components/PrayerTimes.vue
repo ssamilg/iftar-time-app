@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, computed } from 'vue';
+import { defineProps, computed, ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
   times: {
@@ -8,14 +8,30 @@ const props = defineProps({
   }
 });
 
+const currentTime = ref(new Date());
+
+let timer = null;
+
+onMounted(() => {
+  timer = setInterval(() => {
+    currentTime.value = new Date();
+  }, 60000); // Update every minute
+});
+
+onUnmounted(() => {
+  if (timer) {
+    clearInterval(timer);
+  }
+});
+
 const currentTimeIndex = computed(() => {
-  const now = new Date();
-  const currentTimestamp = now.setHours(now.getHours(), now.getMinutes(), 0, 0);
+  const now = currentTime.value;
+  const currentTimestamp = new Date(now).setHours(now.getHours(), now.getMinutes(), 0, 0);
   let currentIndex = -1;
 
   props.times.forEach((time, index) => {
     const [hours, minutes] = time.time.split(':');
-    const timestamp = now.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    const timestamp = new Date(now).setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
     if (currentTimestamp >= timestamp) {
       currentIndex = index;

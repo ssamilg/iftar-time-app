@@ -29,6 +29,7 @@ const showSettings = ref(false);
 const showDate = ref(localStorage.getItem('showDate') !== 'false');
 const showHijriDate = ref(localStorage.getItem('showHijriDate') !== 'false');
 const hideSeconds = ref(localStorage.getItem('hideSeconds') === 'true');
+const showDua = ref(false);
 
 const state = reactive({
   times: [],
@@ -44,6 +45,10 @@ const timesTRTranslation = {
   Maghrib: 'Akşam',
   Isha: 'Yatsı',
 };
+
+const displayCity = computed(() => {
+  return props.currentTheme === 'dune' ? 'Arrakis' : store.selectedCity;
+});
 
 const iftarTime = computed(() => {
   return getAdhanTime('Maghrib');
@@ -73,6 +78,7 @@ const fetchData = async () => {
   try {
     await store.fetchAllTimes();
     setAdhanTimeList();
+    showDua.value = false;
     emit('ready');
   } catch (error) {
     console.error('Error fetching prayer times:', error);
@@ -125,11 +131,6 @@ const getAdhanTime = (name) => {
 
     const now = new Date();
     adhanTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
-
-    // Apply 1-minute correction to Maghrib (iftar) time
-    if (name === 'Maghrib') {
-      adhanTime.setMinutes(adhanTime.getMinutes() - 1);
-    }
   }
 
   return adhanTime;
@@ -195,6 +196,10 @@ const handleSettingsUpdate = (settings) => {
   emit('updateSettings', settings);
 };
 
+const handleDuaVisibility = (isVisible) => {
+  showDua.value = isVisible;
+};
+
 onMounted(() => {
   fetchData();
 });
@@ -220,7 +225,7 @@ onMounted(() => {
               <div class="basis-auto">
                 <div class="text-2xl flex items-center gap-4">
                   <div class="basis-auto">
-                    {{ store.selectedCity }}
+                    {{ displayCity }}
                   </div>
 
                   <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="handleSettingsClick">
@@ -252,10 +257,24 @@ onMounted(() => {
           :mode="timerMode"
           :hide-seconds="hideSeconds"
           @timer-complete="fetchData"
+          @dua-visible="handleDuaVisibility"
         />
 
-        <!-- Bottom: Prayer Times -->
-        <PrayerTimes :times="state.times" />
+        <!-- Bottom: Prayer Times or Dua -->
+        <transition name="fade" mode="out-in">
+          <div v-if="showDua" class="dua-container">
+            <div class="dua-text">
+              <p>Allah'ım!</p>
+              <p>
+                Senin rızan için oruç tuttum, sana inandım ve sana güvendim.
+                Senin rızkınla orucumu açtım ve Ramazan ayının yarınki orucuna da niyet ettim.
+                Benim geçmiş ve gelecek günahlarımı bağışla!
+              </p>
+              <p>Amin</p>
+            </div>
+          </div>
+          <PrayerTimes v-else :times="state.times" />
+        </transition>
       </div>
     </div>
 
@@ -285,6 +304,16 @@ onMounted(() => {
 .flex-leave-to {
   opacity: 0;
   transform: translateY(20px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
 }
 
 .bi {
@@ -349,5 +378,14 @@ onMounted(() => {
 
 .stars {
   animation: fadeInOut 6s infinite 4s;
+}
+
+.dua-container {
+  @apply flex w-full justify-center text-sm mt-10;
+}
+
+.dua-text {
+  @apply text-center text-lg sm:text-xl md:text-3xl italic font-medium text-primary/90 mx-2 px-4 py-6 rounded-lg bg-primary/10 border border-primary/20 shadow-sm max-w-sm md:max-w-xl;
+  line-height: 1.6;
 }
 </style>

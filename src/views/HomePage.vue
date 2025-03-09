@@ -16,6 +16,7 @@ const themes = [
   { value: 'seljuk', label: 'Seljuk', font: 'Kavivanar' },
   { value: 'digital', label: 'Digital', font: 'VT323' },
   { value: 'ssg', label: 'SSG', font: 'Poppins' },
+  { value: 'dune', label: 'Dune', font: 'Chakra Petch' },
 ];
 
 const handleBack = () => {

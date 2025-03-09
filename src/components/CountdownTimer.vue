@@ -16,13 +16,21 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['timerComplete']);
+const emit = defineEmits(['timerComplete', 'duaVisible']);
 
 const hours = ref(0);
 const minutes = ref(0);
 const seconds = ref(0);
 let intervalId = null;
 let lastDiff = null;
+
+const showDua = computed(() => {
+  return props.mode === 'iftar' && hours.value === 0 && minutes.value === 0 && seconds.value < 60;
+});
+
+watch(showDua, (newValue) => {
+  emit('duaVisible', newValue);
+});
 
 const display = computed(() => {
   const result = {
@@ -68,6 +76,10 @@ const calculateTimeDiff = () => {
 
     if (lastDiff > 0) {
       emit('timerComplete');
+      // Ensure dua is hidden when timer completes
+      if (showDua.value) {
+        emit('duaVisible', false);
+      }
     }
   } else {
     hours.value = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -101,7 +113,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex justify-center">
+  <div class="flex justify-center flex-col items-center">
     <div class="basis-auto">
       <div class="timer-title">
         {{ mode === 'iftar' ? 'İftara' : 'İmsak Vaktine' }}

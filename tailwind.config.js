@@ -52,6 +52,12 @@ export default {
           "primary": "#F1F5F9",   /* Slate-100 for content */
           "--primary-content": "#3B82F6",  /* Blue-500 for UI elements */
         },
+        dune: {
+          "base-100": "#8B5A2B",  /* Desert sand background */
+          "base-200": "#654321",  /* Darker sand for gradient depth */
+          "primary": "#E6C79C",   /* Light sand color for text */
+          "--primary-content": "#C4661F",  /* Spice melange orange for UI elements */
+        },
       },
     ],
   },

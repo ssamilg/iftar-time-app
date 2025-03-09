@@ -9,7 +9,7 @@ const props = defineProps({
 });
 
 const isVisible = computed(() => {
-  return ['islamic', 'ottoman', 'seljuk', 'dark', 'light'].includes(props.theme);
+  return ['islamic', 'ottoman', 'seljuk', 'dark', 'light', 'dune'].includes(props.theme);
 });
 </script>
 
@@ -44,6 +44,16 @@ const isVisible = computed(() => {
         <div class="main-content">
           <div class="pattern-container">
             <div class="star-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dune Theme Patterns -->
+      <div v-else-if="theme === 'dune'" class="dune-patterns" key="dune">
+        <div class="main-content">
+          <div class="pattern-container">
+            <div class="sand-ripples"></div>
+            <div class="spice-dust"></div>
           </div>
         </div>
       </div>
@@ -247,6 +257,62 @@ const isVisible = computed(() => {
         black 20px,
         black 40px
       );
+    }
+  }
+}
+
+// Dune Theme
+.dune-patterns {
+  @apply transition-opacity duration-500;
+  .main-content {
+    @apply fixed inset-0 flex items-center justify-center;
+  }
+
+  .pattern-container {
+    @apply relative;
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    margin: 0 auto;
+  }
+
+  .sand-ripples {
+    @apply absolute inset-0;
+    background-image: repeating-linear-gradient(
+      45deg,
+      theme('colors.primary'),
+      theme('colors.primary') 1px,
+      transparent 1px,
+      transparent 20px
+    );
+    opacity: 0.1;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 30%,
+      black 70%,
+      transparent
+    );
+  }
+
+  .spice-dust {
+    @apply absolute inset-0;
+    background-image: radial-gradient(
+      circle,
+      #C4661F 1px,
+      transparent 1px
+    );
+    background-size: 30px 30px;
+    opacity: 0.15;
+    animation: float 60s infinite linear;
+  }
+
+  @keyframes float {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 100px 100px;
     }
   }
 }
