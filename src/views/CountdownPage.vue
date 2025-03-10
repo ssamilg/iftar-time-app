@@ -235,14 +235,14 @@ onMounted(() => {
               </div>
             </div>
 
-            <div class="flex items-center opacity-70">
-              <div v-if="showDate" class="basis-auto">
+            <div class="flex flex-wrap items-center justify-center text-center opacity-70">
+              <div v-if="showDate" class="mr-1">
                 {{ formattedDate }}
               </div>
 
-              <div v-if="showHijriDate && formattedHijriDate" class="basis-auto">
+              <div v-if="showHijriDate && formattedHijriDate" class="flex items-center">
                 <template v-if="showDate">
-                  <i class="bi bi-dot"></i>
+                  <i class="bi bi-dot mx-1"></i>
                 </template>
                 {{ formattedHijriDate }}
               </div>
