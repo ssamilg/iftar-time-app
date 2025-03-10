@@ -206,8 +206,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex h-5/6 mt-8">
-    <div v-show="store.isLoading" class="flex flex-col items-center justify-center w-full animate-fade-in gap-6">
+  <div class="flex flex-col h-full">
+    <div v-show="store.isLoading" class="flex flex-col items-center justify-center w-full animate-fade-in gap-6 py-8">
       <div class="loading-cycle">
         <i class="bi bi-sun-fill cycle-icon sun"></i>
         <i class="bi bi-moon-fill cycle-icon moon"></i>
@@ -216,10 +216,10 @@ onMounted(() => {
       <div class="text-lg opacity-80">Vakitler yükleniyor...</div>
     </div>
 
-    <div v-show="!store.isLoading" class="basis-full w-full">
-      <div class="flex flex-col h-full justify-between">
+    <div v-show="!store.isLoading" class="w-full h-full">
+      <div class="flex flex-col h-full">
         <!-- Top: City Info -->
-        <div class="flex justify-center">
+        <div class="flex justify-center pt-8">
           <div class="basis-auto">
             <div class="flex items-center justify-center w-full gap-4">
               <div class="basis-auto">
@@ -250,31 +250,35 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Middle: Counter -->
-        <CountdownTimer
-          v-if="!store.isLoading"
-          :target-time="targetTime"
-          :mode="timerMode"
-          :hide-seconds="hideSeconds"
-          @timer-complete="fetchData"
-          @dua-visible="handleDuaVisibility"
-        />
+        <!-- Middle: Counter - Now with flex-grow to center it -->
+        <div class="flex-grow flex items-center justify-center">
+          <CountdownTimer
+            v-if="!store.isLoading"
+            :target-time="targetTime"
+            :mode="timerMode"
+            :hide-seconds="hideSeconds"
+            @timer-complete="fetchData"
+            @dua-visible="handleDuaVisibility"
+          />
+        </div>
 
-        <!-- Bottom: Prayer Times or Dua -->
-        <transition name="fade" mode="out-in">
-          <div v-if="showDua" class="dua-container">
-            <div class="dua-text">
-              <p>Allah'ım!</p>
-              <p>
-                Senin rızan için oruç tuttum, sana inandım ve sana güvendim.
-                Senin rızkınla orucumu açtım ve Ramazan ayının yarınki orucuna da niyet ettim.
-                Benim geçmiş ve gelecek günahlarımı bağışla!
-              </p>
-              <p>Amin</p>
+        <!-- Bottom: Prayer Times or Dua - Now positioned at the bottom -->
+        <div class="mb-4">
+          <transition name="fade" mode="out-in">
+            <div v-if="showDua" class="dua-container">
+              <div class="dua-text">
+                <p>Allah'ım!</p>
+                <p>
+                  Senin rızan için oruç tuttum, sana inandım ve sana güvendim.
+                  Senin rızkınla orucumu açtım ve Ramazan ayının yarınki orucuna da niyet ettim.
+                  Benim geçmiş ve gelecek günahlarımı bağışla!
+                </p>
+                <p>Amin</p>
+              </div>
             </div>
-          </div>
-          <PrayerTimes v-else :times="state.times" />
-        </transition>
+            <PrayerTimes v-else :times="state.times" />
+          </transition>
+        </div>
       </div>
     </div>
 
