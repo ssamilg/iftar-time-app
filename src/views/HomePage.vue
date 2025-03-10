@@ -74,31 +74,33 @@ onMounted(() => {
 
 <template>
   <div
-    class="relative flex h-dvh w-full justify-center home-page"
+    class="relative flex h-dvh w-full justify-center home-page overflow-auto"
     :style="{ fontFamily: currentFont }"
   >
     <ThemePatterns :theme="currentTheme" />
-    <div class="basis-full text-primary">
-      <CitySelector
-        v-if="!showCountdown"
-        :current-font="currentFont"
-        @start="handleStart"
-      />
+    <div class="basis-full text-primary flex flex-col">
+      <div class="flex-grow">
+        <CitySelector
+          v-if="!showCountdown"
+          :current-font="currentFont"
+          @start="handleStart"
+        />
 
-      <CountdownPage
-        v-else
-        :city="city"
-        :current-theme="currentTheme"
-        :themes="themes"
-        @back="handleBack"
-        @update-settings="handleSettingsUpdate"
-      />
-    </div>
+        <CountdownPage
+          v-else
+          :city="city"
+          :current-theme="currentTheme"
+          :themes="themes"
+          @back="handleBack"
+          @update-settings="handleSettingsUpdate"
+        />
+      </div>
 
-    <div class="absolute bottom-0 text-center text-primary flex flex-col gap-4 pb-4">
-      <a href="https://ssamilg.dev">
-        SSG
-      </a>
+      <div class="text-center py-4">
+        <a href="https://ssamilg.dev" class="text-primary hover:opacity-80 transition-opacity">
+          SSG
+        </a>
+      </div>
     </div>
   </div>
 </template>
