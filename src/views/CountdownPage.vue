@@ -207,7 +207,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col h-full">
-    <div v-show="store.isLoading" class="flex flex-col items-center justify-center w-full animate-fade-in gap-6 py-8">
+    <div v-if="store.isLoading" class="flex flex-col items-center justify-center w-full h-full animate-fade-in gap-6 py-8">
       <div class="loading-cycle">
         <i class="bi bi-sun-fill cycle-icon sun"></i>
         <i class="bi bi-moon-fill cycle-icon moon"></i>
@@ -216,7 +216,7 @@ onMounted(() => {
       <div class="text-lg opacity-80">Vakitler yükleniyor...</div>
     </div>
 
-    <div v-show="!store.isLoading" class="w-full h-full">
+    <div v-else class="w-full h-full">
       <div class="flex flex-col h-full">
         <!-- Top: City Info -->
         <div class="flex justify-center pt-8">
