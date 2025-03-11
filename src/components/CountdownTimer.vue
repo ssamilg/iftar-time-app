@@ -1,5 +1,8 @@
 <script setup>
 import { onBeforeUnmount, ref, watch, computed } from 'vue';
+import { useStore } from '@/stores';
+
+const store = useStore();
 
 const props = defineProps({
   targetTime: {
@@ -23,12 +26,20 @@ const minutes = ref(0);
 const seconds = ref(0);
 let intervalId = null;
 let lastDiff = null;
+const showIftarMessage = ref(false);
 
 const showDua = computed(() => {
   return props.mode === 'iftar' && hours.value === 0 && minutes.value === 0 && seconds.value < 60;
 });
 
 watch(showDua, (newValue) => {
+  if (newValue) {
+    showIftarMessage.value = true;
+    setTimeout(() => {
+      showIftarMessage.value = false;
+      emit('timerComplete');
+    }, 120000); // Show for 2 minutes
+  }
   emit('duaVisible', newValue);
 });
 
@@ -116,10 +127,21 @@ onBeforeUnmount(() => {
   <div class="flex justify-center flex-col items-center">
     <div class="basis-auto">
       <div class="timer-title">
-        {{ mode === 'iftar' ? 'İftara' : 'İmsak Vaktine' }}
+        <template v-if="showIftarMessage">
+          <div class="iftar-message mt-10">
+            <div class="city-name">{{ store.selectedCity }}</div>
+            <div class="message-text">
+              <p>için</p>
+              <p>iftar vakti!</p>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          {{ mode === 'iftar' ? 'İftara' : 'İmsak Vaktine' }}
+        </template>
       </div>
 
-      <div class="flex items-end gap-2">
+      <div v-if="!showIftarMessage" class="flex items-end gap-2">
         <template v-if="display.showHours">
           <div :class="display.hourClass">
             <div :style="{ '--value': hours }" />
@@ -147,7 +169,48 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .timer-title {
-  @apply text-xl sm:text-2xl opacity-70 text-center mb-4;
+  @apply text-xl sm:text-2xl md:text-3xl 2xl:text-4xl opacity-70 text-center mb-4;
+
+  &:has(.iftar-message) {
+    @apply opacity-100;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.iftar-message {
+  @apply flex flex-col items-center gap-2 text-primary;
+
+  .city-name {
+    @apply text-6xl sm:text-5xl md:text-6xl 2xl:text-7xl font-bold opacity-0;
+    animation: slideInUp 0.5s ease-out forwards;
+  }
+
+  .message-text {
+    @apply text-5xl sm:text-3xl md:text-4xl 2xl:text-5xl font-medium flex flex-col items-center gap-1;
+
+    p {
+      opacity: 0;
+      animation: slideInUp 0.5s ease-out forwards;
+
+      &:first-child {
+        animation-delay: 0.3s;
+      }
+
+      &:last-child {
+        animation-delay: 0.6s;
+      }
+    }
+  }
 }
 
 .digit-label {

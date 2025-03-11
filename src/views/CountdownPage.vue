@@ -265,7 +265,7 @@ onMounted(() => {
         <!-- Bottom: Prayer Times or Dua - Now positioned at the bottom -->
         <div class="mb-4">
           <transition name="fade" mode="out-in">
-            <div v-if="showDua" class="dua-container">
+            <div v-if="true" class="dua-container">
               <div class="dua-text">
                 <p>Allah'ım!</p>
                 <p>
@@ -389,7 +389,7 @@ onMounted(() => {
 }
 
 .dua-text {
-  @apply text-center text-lg sm:text-xl md:text-3xl italic font-medium text-primary/90 mx-2 px-4 py-6 rounded-lg bg-primary/10 border border-primary/20 shadow-sm max-w-sm md:max-w-xl;
+  @apply text-center text-lg sm:text-xl md:text-2xl italic font-medium text-primary/90 mx-2 px-4 py-6 rounded-lg bg-primary/10 border border-primary/20 shadow-sm max-w-sm md:max-w-xl;
   line-height: 1.6;
 }
 </style>
