@@ -30,18 +30,34 @@ const showIftarMessage = ref(false);
 let messageTimer = null;
 
 const showDua = computed(() => {
-  return props.mode === 'iftar' && hours.value === 0 && minutes.value === 0 && seconds.value < 60;
+  return props.mode === 'iftar' && hours.value === 0 && minutes.value === 0;
+});
+
+const iftarTime = computed(() => {
+  return store.prayerTimes?.data.timings.Maghrib;
 });
 
 watch(() => [showDua.value, seconds.value], ([isDua, secs]) => {
-  if (isDua && secs === 0) {
+  if (isDua) {
+    // Show dua immediately when we enter last minute
     emit('duaVisible', true);
-    showIftarMessage.value = true;
-    messageTimer = setTimeout(() => {
-      showIftarMessage.value = false;
-      emit('duaVisible', false);
-      emit('timerComplete');
-    }, 60000);
+
+    // Show iftar message only when timer hits 0
+    if (secs === 0) {
+      showIftarMessage.value = true;
+      messageTimer = setTimeout(() => {
+        showIftarMessage.value = false;
+        emit('duaVisible', false);
+        emit('timerComplete');
+      }, 60000);
+    }
+  } else {
+    if (messageTimer) {
+      clearTimeout(messageTimer);
+      messageTimer = null;
+    }
+    showIftarMessage.value = false;
+    emit('duaVisible', false);
   }
 });
 
@@ -88,10 +104,8 @@ const calculateTimeDiff = () => {
     seconds.value = 0;
 
     if (lastDiff > 0) {
-      emit('timerComplete');
-      // Ensure dua is hidden when timer completes
-      if (showDua.value) {
-        emit('duaVisible', false);
+      if (!showDua.value) {
+        emit('timerComplete');
       }
     }
   } else {
@@ -135,6 +149,7 @@ onBeforeUnmount(() => {
       <div class="timer-title">
         <template v-if="showIftarMessage">
           <div class="iftar-message mt-10">
+            <div class="iftar-time">{{ iftarTime }}</div>
             <div class="city-name">{{ store.selectedCity }}</div>
             <div class="message-text">
               <p>için</p>
@@ -196,9 +211,14 @@ onBeforeUnmount(() => {
 .iftar-message {
   @apply flex flex-col items-center gap-2 text-primary;
 
+  .iftar-time {
+    @apply text-5xl sm:text-4xl md:text-5xl 2xl:text-6xl font-medium opacity-0;
+    animation: slideInUp 0.5s ease-out forwards;
+  }
+
   .city-name {
     @apply text-6xl sm:text-5xl md:text-6xl 2xl:text-7xl font-bold opacity-0;
-    animation: slideInUp 0.5s ease-out forwards;
+    animation: slideInUp 0.5s ease-out forwards 0.3s;
   }
 
   .message-text {
@@ -209,11 +229,11 @@ onBeforeUnmount(() => {
       animation: slideInUp 0.5s ease-out forwards;
 
       &:first-child {
-        animation-delay: 0.3s;
+        animation-delay: 0.6s;
       }
 
       &:last-child {
-        animation-delay: 0.6s;
+        animation-delay: 0.9s;
       }
     }
   }
