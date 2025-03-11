@@ -27,20 +27,22 @@ const seconds = ref(0);
 let intervalId = null;
 let lastDiff = null;
 const showIftarMessage = ref(false);
+let messageTimer = null;
 
 const showDua = computed(() => {
   return props.mode === 'iftar' && hours.value === 0 && minutes.value === 0 && seconds.value < 60;
 });
 
-watch(showDua, (newValue) => {
-  if (newValue) {
+watch(() => [showDua.value, seconds.value], ([isDua, secs]) => {
+  if (isDua && secs === 0) {
+    emit('duaVisible', true);
     showIftarMessage.value = true;
-    setTimeout(() => {
+    messageTimer = setTimeout(() => {
       showIftarMessage.value = false;
+      emit('duaVisible', false);
       emit('timerComplete');
-    }, 120000); // Show for 2 minutes
+    }, 60000);
   }
-  emit('duaVisible', newValue);
 });
 
 const display = computed(() => {
@@ -119,6 +121,10 @@ onBeforeUnmount(() => {
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
+  }
+  if (messageTimer) {
+    clearTimeout(messageTimer);
+    messageTimer = null;
   }
 });
 </script>
