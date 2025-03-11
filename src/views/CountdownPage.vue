@@ -265,7 +265,7 @@ onMounted(() => {
         <!-- Bottom: Prayer Times or Dua - Now positioned at the bottom -->
         <div class="mb-4">
           <transition name="fade" mode="out-in">
-            <div v-if="true" class="dua-container">
+            <div v-if="showDua" class="dua-container">
               <div class="dua-text">
                 <p>Allah'ım!</p>
                 <p>
