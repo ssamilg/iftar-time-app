@@ -13,7 +13,7 @@ const props = defineProps({
     type: String,
     required: true
   },
-  hideSeconds: {
+  showSeconds: {
     type: Boolean,
     required: true
   }
@@ -49,7 +49,7 @@ const display = computed(() => {
   const result = {
     showHours: false,
     showMinutes: true,
-    showSeconds: !props.hideSeconds || (hours.value === 0 && minutes.value === 0),
+    showSeconds: props.showSeconds || (hours.value === 0 && minutes.value === 0),
     hourClass: 'countdown countdown-digit',
     minuteClass: 'countdown countdown-digit',
     secondClass: 'countdown countdown-digit-small',

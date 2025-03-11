@@ -28,7 +28,7 @@ const store = useStore();
 const showSettings = ref(false);
 const showDate = ref(localStorage.getItem('showDate') !== 'false');
 const showHijriDate = ref(localStorage.getItem('showHijriDate') !== 'false');
-const hideSeconds = ref(localStorage.getItem('hideSeconds') === 'true');
+const showSeconds = ref(localStorage.getItem('showSeconds') !== 'false');
 const showDua = ref(false);
 
 const state = reactive({
@@ -189,9 +189,9 @@ const handleSettingsUpdate = (settings) => {
     localStorage.setItem('showHijriDate', settings.showHijriDate);
     showHijriDate.value = settings.showHijriDate;
   }
-  if (settings.hideSeconds !== undefined) {
-    localStorage.setItem('hideSeconds', settings.hideSeconds);
-    hideSeconds.value = settings.hideSeconds;
+  if (settings.showSeconds !== undefined) {
+    localStorage.setItem('showSeconds', settings.showSeconds);
+    showSeconds.value = settings.showSeconds;
   }
   emit('updateSettings', settings);
 };
@@ -256,7 +256,7 @@ onMounted(() => {
             v-if="!store.isLoading"
             :target-time="targetTime"
             :mode="timerMode"
-            :hide-seconds="hideSeconds"
+            :show-seconds="showSeconds"
             @timer-complete="fetchData"
             @dua-visible="handleDuaVisibility"
           />
@@ -289,7 +289,7 @@ onMounted(() => {
       :current-theme="props.currentTheme"
       :show-date="showDate"
       :show-hijri-date="showHijriDate"
-      :hide-seconds="hideSeconds"
+      :show-seconds="showSeconds"
       :themes="props.themes"
       @close="handleSettingsClose"
       @update-settings="handleSettingsUpdate"
