@@ -17,6 +17,7 @@ const themes = [
   { value: 'digital', label: 'Digital', font: 'VT323' },
   { value: 'ssg', label: 'SSG', font: 'Poppins' },
   { value: 'dune', label: 'Dune', font: 'Chakra Petch' },
+  { value: 'andalus', label: 'Andalus', font: 'Amiri' },
 ];
 
 const handleBack = () => {
