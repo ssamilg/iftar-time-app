@@ -58,6 +58,12 @@ export default {
           "primary": "#E6C79C",   /* Light sand color for text */
           "--primary-content": "#C4661F",  /* Spice melange orange for UI elements */
         },
+        andalus: {
+          "base-100": "#F5ECD7",  /* Andalusian warm cream */
+          "base-200": "#E6D5B8",  /* Deeper cream for gradient */
+          "primary": "#722F37",   /* Bordeaux wine red */
+          "--primary-content": "#8B4513",  /* Saddle brown for UI accents */
+        },
       },
     ],
   },

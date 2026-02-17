@@ -9,7 +9,7 @@ const props = defineProps({
 });
 
 const isVisible = computed(() => {
-  return ['islamic', 'ottoman', 'seljuk', 'dark', 'light', 'dune'].includes(props.theme);
+  return ['islamic', 'ottoman', 'seljuk', 'dark', 'light', 'dune', 'andalus'].includes(props.theme);
 });
 </script>
 
@@ -54,6 +54,16 @@ const isVisible = computed(() => {
           <div class="pattern-container">
             <div class="sand-ripples"></div>
             <div class="spice-dust"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Andalus Theme Patterns -->
+      <div v-else-if="theme === 'andalus'" class="andalus-patterns" key="andalus">
+        <div class="main-content">
+          <div class="pattern-container">
+            <div class="sebka-lattice"></div>
+            <div class="arch-pattern"></div>
           </div>
         </div>
       </div>
@@ -314,6 +324,54 @@ const isVisible = computed(() => {
     100% {
       background-position: 100px 100px;
     }
+  }
+}
+
+// Andalus Theme
+.andalus-patterns {
+  @apply transition-opacity duration-500;
+  .main-content {
+    @apply fixed inset-0;
+  }
+  .pattern-container {
+    @apply relative;
+    width: 100%;
+    height: 100%;
+  }
+  .sebka-lattice {
+    @apply absolute inset-0;
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 29px,
+        rgba(114, 47, 55, 0.06) 29px,
+        rgba(114, 47, 55, 0.06) 30px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 29px,
+        rgba(114, 47, 55, 0.06) 29px,
+        rgba(114, 47, 55, 0.06) 30px
+      );
+    mask-image: radial-gradient(
+      ellipse at center,
+      black 20%,
+      transparent 70%
+    );
+  }
+  .arch-pattern {
+    @apply absolute inset-0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='80' viewBox='0 0 60 80'%3E%3Cline x1='0' y1='79.5' x2='60' y2='79.5' stroke='%23722F37' stroke-width='0.5'/%3E%3Cpath d='M 4 80 V 36 C 4 10 56 10 56 36 V 80' fill='none' stroke='%23722F37' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-size: 60px 80px;
+    background-repeat: repeat;
+    opacity: 0.12;
+    mask-image: radial-gradient(
+      ellipse at center,
+      black 20%,
+      transparent 75%
+    );
   }
 }
 </style>
