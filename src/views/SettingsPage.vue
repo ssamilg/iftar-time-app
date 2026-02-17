@@ -62,6 +62,8 @@ const handleClose = () => {
 
 const handleCitySelect = (city) => {
   selectedCity.value = city;
+  store.setSelectedCity(selectedCity.value);
+  emit('refresh');
 };
 
 const handleThemeChange = (theme) => {
@@ -75,11 +77,17 @@ const handleThemeChange = (theme) => {
     <div class="bg-base-100 p-4 rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90dvh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Ayarlar</h2>
-        <button class="btn btn-circle btn-ghost btn-sm" @click="handleClose">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div class="flex justify-end gap-2">
+          <button class="btn btn-primary btn-sm" @click="handleSave">
+            Kaydet
+          </button>
+
+          <button class="btn btn-circle btn-ghost btn-sm" @click="handleClose">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div class="space-y-4">
@@ -179,13 +187,6 @@ const handleThemeChange = (theme) => {
              </div>
            </div>
          </div>
-
-        <!-- Save Button -->
-        <div class="flex justify-end">
-          <button class="btn btn-primary btn-sm" @click="handleSave">
-            Kaydet
-          </button>
-        </div>
       </div>
     </div>
 
