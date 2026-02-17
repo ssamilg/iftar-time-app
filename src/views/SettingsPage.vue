@@ -137,17 +137,21 @@ const handleThemeChange = (theme) => {
           <label class="label py-1">
             <span class="label-text">Tema</span>
           </label>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
             <button
               v-for="theme in themes"
               :key="theme.value"
-              class="btn btn-sm"
-              :class="[
-                selectedTheme === theme.value ? 'btn-primary' : 'btn-outline',
-              ]"
+              :data-theme="theme.value"
+              class="theme-card"
+              :class="{ 'theme-card--active': selectedTheme === theme.value }"
               @click="handleThemeChange(theme.value)"
             >
-              {{ theme.label }}
+              <span
+                class="text-primary font-bold leading-none"
+                :style="{ fontFamily: theme.font }"
+              >
+                {{ theme.label }}
+              </span>
             </button>
           </div>
         </div>
@@ -158,13 +162,15 @@ const handleThemeChange = (theme) => {
              <div class="card-body p-3">
                <p class="text-xs opacity-70">
                  Namaz vakitleri
+                 <!-- href="https://ezanvakti.emushaf.net/" -->
                  <a
-                   href="https://aladhan.com/prayer-times-api"
+                  href="https://aladhan.com/prayer-times-api"
                    target="_blank"
                    rel="noopener noreferrer"
                    class="link link-primary"
                  >
-                   Aladhan API
+                 Aladhan API
+                   <!-- Diyanet -->
                  </a> tarafından sağlanmaktadır. Vakitler resmi kaynaklardan farklılık gösterebilir.
                </p>
              </div>
@@ -200,3 +206,21 @@ const handleThemeChange = (theme) => {
     />
   </div>
 </template>
+
+<style scoped>
+.theme-card {
+  @apply flex flex-col items-center justify-center
+    aspect-[3/1] rounded-lg cursor-pointer
+    border border-base-content/10
+    bg-gradient-to-br from-base-100 to-base-300
+    transition-all duration-200;
+}
+
+.theme-card:hover {
+  @apply scale-[1.05] shadow-md;
+}
+
+.theme-card--active {
+  @apply ring-2 ring-offset-2 ring-primary;
+}
+</style>

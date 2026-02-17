@@ -30,7 +30,7 @@ const isVisible = computed(() => {
         <div class="main-content">
           <!-- Center Calligraphy -->
           <div class="center-calligraphy">
-            <!-- <img src="@/assets/images/hat-2.svg" class="hat-calligraphy"> -->
+            <!-- <img src="@/assets/images/vav-elif.png" class="hat-calligraphy"> -->
             <img src="@/assets/images/vav-elif.png" class="hat-calligraphy">
           </div>
 
