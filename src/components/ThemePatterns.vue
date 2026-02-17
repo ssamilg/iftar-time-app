@@ -44,6 +44,8 @@ const isVisible = computed(() => {
         <div class="main-content">
           <div class="pattern-container">
             <div class="star-grid"></div>
+            <!-- <img src="@/assets/images/seljuk_eagle_alt.svg" class="absolute bottom-10 right-1/2 translate-x-1/2  max-w-80 lg:max-w-96 opacity-20"> -->
+            <img src="@/assets/images/seljuk_eagle.svg" class="absolute bottom-10 right-1/2 translate-x-1/2  max-w-80 lg:max-w-96 opacity-20">
           </div>
         </div>
       </div>
