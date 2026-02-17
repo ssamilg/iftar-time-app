@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from '@/plugins/axios';
 import dayjs from 'dayjs';
+import { getDiyanetPrayerTimes } from '@/services/diyanetService';
 
 export const useStore = defineStore('index', {
   state: () => ({
@@ -55,27 +56,35 @@ export const useStore = defineStore('index', {
     },
 
     async fetchAllTimes() {
+      this.isLoading = true;
       try {
-        const params = {
-          country: 'Turkey',
-          method: 13,
-        };
+        const country = 'Turkey';
 
-        await this.fetchTimesByCity(params);
+        if (country === 'Turkey') {
+          const result = await getDiyanetPrayerTimes(this.selectedCity);
+          this.prayerTimes = result.today;
+          this.nextDayTimes = result.tomorrow;
+          this.hijriDate = result.today?.data?.date?.hijri;
+        } else {
+          const params = { country, method: 13 };
+          await this.fetchTimesByCity(params);
 
-        let nextDay = new Date();
-        nextDay.setDate(nextDay.getDate() + 1);
-        nextDay = dayjs(nextDay).format('DD-MM-YYYY');
+          let nextDay = new Date();
+          nextDay.setDate(nextDay.getDate() + 1);
+          nextDay = dayjs(nextDay).format('DD-MM-YYYY');
 
-        await this.fetchTimesByCityAndDate(nextDay, params);
+          await this.fetchTimesByCityAndDate(nextDay, params);
+        }
 
         return {
           prayerTimes: this.prayerTimes,
-          nextDayTimes: this.nextDayTimes
+          nextDayTimes: this.nextDayTimes,
         };
       } catch (error) {
         console.error('Error fetching all times:', error);
         throw error;
+      } finally {
+        this.isLoading = false;
       }
     }
   },
