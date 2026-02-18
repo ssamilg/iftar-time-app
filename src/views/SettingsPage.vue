@@ -76,11 +76,13 @@ const handleCitySelect = (city) => {
   selectedCity.value = city;
   store.setSelectedCity(selectedCity.value);
   emit('refresh');
+  emit('close');
 };
 
 const handleThemeChange = (theme) => {
   selectedTheme.value = theme;
   emit('updateSettings', { theme });
+  emit('close');
 };
 </script>
 
