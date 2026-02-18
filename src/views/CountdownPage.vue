@@ -29,6 +29,8 @@ const showSettings = ref(false);
 const showDate = ref(localStorage.getItem('showDate') !== 'false');
 const showHijriDate = ref(localStorage.getItem('showHijriDate') !== 'false');
 const showSeconds = ref(localStorage.getItem('showSeconds') !== 'false');
+const showPrayerTimes = ref(localStorage.getItem('showPrayerTimes') !== 'false');
+const showPattern = ref(localStorage.getItem('showPattern') !== 'false');
 const showDua = ref(false);
 
 const state = reactive({
@@ -193,6 +195,14 @@ const handleSettingsUpdate = (settings) => {
     localStorage.setItem('showSeconds', settings.showSeconds);
     showSeconds.value = settings.showSeconds;
   }
+  if (settings.showPrayerTimes !== undefined) {
+    localStorage.setItem('showPrayerTimes', settings.showPrayerTimes);
+    showPrayerTimes.value = settings.showPrayerTimes;
+  }
+  if (settings.showPattern !== undefined) {
+    localStorage.setItem('showPattern', settings.showPattern);
+    showPattern.value = settings.showPattern;
+  }
   emit('updateSettings', settings);
 };
 
@@ -276,7 +286,7 @@ onMounted(() => {
                 <p>Amin</p>
               </div>
             </div>
-            <PrayerTimes v-else :times="state.times" />
+            <PrayerTimes v-else-if="showPrayerTimes" :times="state.times" />
           </transition>
         </div>
       </div>
@@ -290,6 +300,8 @@ onMounted(() => {
       :show-date="showDate"
       :show-hijri-date="showHijriDate"
       :show-seconds="showSeconds"
+      :show-prayer-times="showPrayerTimes"
+      :show-pattern="showPattern"
       :themes="props.themes"
       @close="handleSettingsClose"
       @update-settings="handleSettingsUpdate"

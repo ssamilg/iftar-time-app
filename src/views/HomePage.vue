@@ -8,16 +8,18 @@ const DEFAULT_THEME = 'islamic';
 const city = ref(localStorage.getItem('selectedCity') || 'Ankara');
 const showCountdown = ref(false);
 const currentTheme = ref(localStorage.getItem('selectedTheme') || DEFAULT_THEME);
+const showPattern = ref(localStorage.getItem('showPattern') !== 'false');
 const themes = [
   { value: 'light', label: 'Modern', font: 'Inter' },
   { value: 'dark', label: 'Dark', font: 'Roboto' },
   { value: 'islamic', label: 'Islamic', font: 'Aref Ruqaa' },
-  { value: 'ottoman', label: 'Ottoman', font: 'Quintessential' },
+  { value: 'sufi', label: 'Sufi', font: 'El Messiri' },
+  { value: 'ottoman', label: 'Ottoman', font: 'Prata' },
   { value: 'seljuk', label: 'Seljuk', font: 'Faculty Glyphic' },
+  { value: 'andalus', label: 'Andalus', font: 'Amiri' },
   { value: 'digital', label: 'Digital', font: 'VT323' },
   { value: 'ssg', label: 'SSG', font: 'Poppins' },
   { value: 'dune', label: 'Dune', font: 'Chakra Petch' },
-  { value: 'andalus', label: 'Andalus', font: 'Amiri' },
 ];
 
 const handleBack = () => {
@@ -59,6 +61,11 @@ const handleSettingsUpdate = (settings) => {
   if (settings.theme) {
     handleThemeChange({ target: { value: settings.theme } });
   }
+
+  if (settings.showPattern !== undefined) {
+    localStorage.setItem('showPattern', settings.showPattern);
+    showPattern.value = settings.showPattern;
+  }
 };
 
 onMounted(() => {
@@ -78,7 +85,7 @@ onMounted(() => {
     class="relative flex h-dvh w-full justify-center home-page overflow-auto"
     :style="{ fontFamily: currentFont }"
   >
-    <ThemePatterns :theme="currentTheme" />
+    <ThemePatterns :theme="currentTheme" :show-pattern="showPattern" />
     <div class="basis-full text-primary flex flex-col">
       <div class="flex-grow">
         <CitySelector
