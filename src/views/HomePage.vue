@@ -91,6 +91,7 @@ onMounted(() => {
         <CitySelector
           v-if="!showCountdown"
           :current-font="currentFont"
+          class="blur-2px"
           @start="handleStart"
         />
 
