@@ -28,6 +28,14 @@ const handleCitySelect = (selectedCity) => {
 <template>
   <div class="flex items-center h-full">
     <div class="basis-auto w-full">
+      <div class="flex items-center gap-2 absolute top-5 left-1/2 -translate-x-1/2">
+        <img
+          src="@/assets/images/iftar_app_logo.png"
+          alt="iftar.app"
+          class="w-32 h-32 border-2 border-primary/50 rounded-xl"
+        >
+      </div>
+
       <div class="flex justify-center">
         <button
           class="btn btn-lg border-primary/50 text-primary w-full max-w-xs normal-case text-lg gap-2"
