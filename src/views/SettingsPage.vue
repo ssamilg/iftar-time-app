@@ -24,6 +24,14 @@ const props = defineProps({
     type: Boolean,
     required: true
   },
+  showPrayerTimes: {
+    type: Boolean,
+    required: true
+  },
+  showPattern: {
+    type: Boolean,
+    required: true
+  },
   themes: {
     type: Array,
     required: true
@@ -38,13 +46,17 @@ const selectedTheme = ref(props.currentTheme);
 const showDateToggle = ref(props.showDate);
 const showHijriDateToggle = ref(props.showHijriDate);
 const showSecondsToggle = ref(props.showSeconds);
+const showPrayerTimesToggle = ref(props.showPrayerTimes);
+const showPatternToggle = ref(props.showPattern);
 const showCitySelector = ref(false);
 
 const handleSave = () => {
   const settings = {
     showDate: showDateToggle.value,
     showHijriDate: showHijriDateToggle.value,
-    showSeconds: showSecondsToggle.value
+    showSeconds: showSecondsToggle.value,
+    showPrayerTimes: showPrayerTimesToggle.value,
+    showPattern: showPatternToggle.value,
   };
 
   if (selectedCity.value !== props.currentCity) {
@@ -129,6 +141,22 @@ const handleThemeChange = (theme) => {
           <label class="label cursor-pointer justify-start gap-4">
             <span class="label-text">Saniye Sayacını Göster</span>
             <input type="checkbox" class="toggle toggle-primary" v-model="showSecondsToggle" />
+          </label>
+        </div>
+
+        <!-- Show Prayer Times Toggle -->
+        <div class="form-control !mt-0">
+          <label class="label cursor-pointer justify-start gap-4">
+            <span class="label-text">Namaz Vakitlerini Göster</span>
+            <input type="checkbox" class="toggle toggle-primary" v-model="showPrayerTimesToggle" />
+          </label>
+        </div>
+
+        <!-- Show Background Pattern Toggle -->
+        <div class="form-control !mt-0">
+          <label class="label cursor-pointer justify-start gap-4">
+            <span class="label-text">Arka Plan Desenini Göster</span>
+            <input type="checkbox" class="toggle toggle-primary" v-model="showPatternToggle" />
           </label>
         </div>
 
