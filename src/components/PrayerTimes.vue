@@ -65,7 +65,7 @@ const getTimeClasses = (index) => ({
 
 <template>
   <div class="flex w-full justify-center text-sm mt-10">
-    <div class="basis-full max-w-sm px-4">
+    <div class="basis-full max-w-sm px-4 blur-2px">
       <div class="space-y-1.5">
         <div
           v-for="(time, index) in displayTimes"
@@ -84,6 +84,10 @@ const getTimeClasses = (index) => ({
 </template>
 
 <style lang="scss">
+.blur-2px {
+  backdrop-filter: blur(2px);
+}
+
 .prayer-time {
   &-name {
     @apply flex-1 font-medium text-primary/80 text-right text-base;
