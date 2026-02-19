@@ -50,7 +50,6 @@ const isVisible = computed(() => {
           <div class="pattern-container">
             <div class="tezhip-grid"></div>
             <img v-if="showPattern" src="@/assets/images/selim_tughra.svg" class="ottoman-tughra">
-            <!-- <div class="vignette"></div> -->
           </div>
         </div>
       </div>
@@ -204,8 +203,8 @@ const isVisible = computed(() => {
   }
   .tezhip-grid {
     @apply absolute inset-0;
-    background-image: url('@/assets/images/ottoman_tezhip.svg');
-    background-size: 80px 80px;
+    background-image: url('@/assets/images/ottoman_tezhip_karo.svg');
+    background-size: 120px 120px;
     background-repeat: repeat;
     opacity: 0.1;
     filter: invert(1) brightness(100);
@@ -218,7 +217,7 @@ const isVisible = computed(() => {
     );
   }
   .ottoman-tughra {
-    @apply absolute bottom-20 right-1/2 translate-x-1/2 w-[512px] h-auto opacity-30;
+    @apply absolute bottom-32 md:bottom-20 right-1/2 translate-x-1/2 w-80 md:w-[512px] h-auto opacity-30;
     filter: invert(1) brightness(100);
   }
 }
