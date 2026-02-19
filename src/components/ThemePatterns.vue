@@ -13,7 +13,7 @@ const props = defineProps({
 });
 
 const isVisible = computed(() => {
-  return ['islamic', 'sufi', 'ottoman', 'seljuk', 'dark', 'light', 'dune', 'andalus'].includes(props.theme);
+  return ['islamic', 'sufi', 'ottoman', 'seljuk', 'dark', 'light', 'dune', 'andalus', 'ssg'].includes(props.theme);
 });
 </script>
 
@@ -50,7 +50,6 @@ const isVisible = computed(() => {
           <div class="pattern-container">
             <div class="tezhip-grid"></div>
             <img v-if="showPattern" src="@/assets/images/selim_tughra.svg" class="ottoman-tughra">
-            <!-- <div class="vignette"></div> -->
           </div>
         </div>
       </div>
@@ -72,6 +71,15 @@ const isVisible = computed(() => {
             <div class="sand-ripples"></div>
             <div class="spice-dust"></div>
             <!-- <img v-if="showPattern" src="@/assets/images/shai_hulud.svg" class="dune-worm"> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- SSG Theme Patterns -->
+      <div v-else-if="theme === 'ssg'" class="ssg-patterns" key="ssg">
+        <div class="main-content">
+          <div class="pattern-container">
+            <div class="blueprint-grid"></div>
           </div>
         </div>
       </div>
@@ -204,8 +212,8 @@ const isVisible = computed(() => {
   }
   .tezhip-grid {
     @apply absolute inset-0;
-    background-image: url('@/assets/images/ottoman_tezhip.svg');
-    background-size: 80px 80px;
+    background-image: url('@/assets/images/ottoman_tezhip_karo.svg');
+    background-size: 120px 120px;
     background-repeat: repeat;
     opacity: 0.1;
     filter: invert(1) brightness(100);
@@ -218,7 +226,7 @@ const isVisible = computed(() => {
     );
   }
   .ottoman-tughra {
-    @apply absolute bottom-20 right-1/2 translate-x-1/2 w-[512px] h-auto opacity-30;
+    @apply absolute bottom-32 md:bottom-20 right-1/2 translate-x-1/2 w-80 md:w-[512px] h-auto opacity-30;
     filter: invert(1) brightness(100);
   }
 }
@@ -429,6 +437,35 @@ const isVisible = computed(() => {
   .andalus-coa {
     @apply absolute bottom-[50px] right-1/2 translate-x-1/2  max-w-80 h-64 lg:max-w-96 opacity-20;
     // @apply absolute bottom-5 right-1/2 translate-x-1/2  max-w-80 h-96 lg:max-w-96 opacity-20;
+  }
+}
+
+// SSG Theme
+.ssg-patterns {
+  @apply transition-opacity duration-500;
+  .main-content {
+    @apply fixed inset-0 flex items-center justify-center;
+  }
+  .pattern-container {
+    @apply relative;
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    margin: 0 auto;
+  }
+  .blueprint-grid {
+    @apply absolute inset-0;
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px),
+      linear-gradient(rgba(59, 130, 246, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+    mask-image:
+      linear-gradient(to right, transparent, black 20%, black 80%, transparent),
+      linear-gradient(to bottom, black 65%, transparent 78%);
+    -webkit-mask-composite: destination-in;
+    mask-composite: intersect;
   }
 }
 </style>

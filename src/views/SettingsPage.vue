@@ -232,6 +232,23 @@ const handleThemeChange = (theme) => {
                </p>
              </div>
            </div>
+
+           <div class="flex justify-between items-center mt-4">
+            <p class="text-xs opacity-70">
+              v1.2.0
+            </p>
+            <p class="text-xs">
+              <a
+                href="https://ssamilg.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-primary hover:text-primary/80 transition-colors underline"
+              >
+                SSG
+              </a>
+              tarafından hazırlanmıştır. Muhabbetle 🌹
+            </p>
+           </div>
          </div>
       </div>
     </div>

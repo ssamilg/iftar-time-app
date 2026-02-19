@@ -158,5 +158,6 @@ export async function getDiyanetPrayerTimes(cityName) {
   return {
     today: todayData ? formatResponse(todayData) : null,
     tomorrow: tomorrowData ? formatResponse(tomorrowData) : null,
+    monthly: timesArray,
   };
 }
