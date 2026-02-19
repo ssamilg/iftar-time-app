@@ -108,7 +108,7 @@ watch(() => props.show, (visible) => {
               <span>{{ formatHijriDate(day.HicriTarihKisa) }}</span>
             </div>
 
-            <div class="flex items-center justify-between mt-1.5">
+            <div class="flex items-center justify-between mt-2 pt-2">
               <div class="text-xl font-bold flex items-center gap-1.5">
                 <i class="bi bi-moon-stars-fill text-base opacity-60"></i>
                 <span class="text-xs font-normal opacity-60">İmsak</span>
@@ -155,7 +155,7 @@ watch(() => props.show, (visible) => {
 }
 
 .drawer-content {
-  @apply relative z-10 w-full max-w-lg bg-base-100 rounded-t-2xl
+  @apply relative z-10 w-full max-w-lg lg:max-w-xl bg-base-100 rounded-t-2xl
     flex flex-col max-h-[85vh];
 }
 
