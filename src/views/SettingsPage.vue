@@ -24,6 +24,14 @@ const props = defineProps({
     type: Boolean,
     required: true
   },
+  showPrayerTimes: {
+    type: Boolean,
+    required: true
+  },
+  showPattern: {
+    type: Boolean,
+    required: true
+  },
   themes: {
     type: Array,
     required: true
@@ -38,13 +46,17 @@ const selectedTheme = ref(props.currentTheme);
 const showDateToggle = ref(props.showDate);
 const showHijriDateToggle = ref(props.showHijriDate);
 const showSecondsToggle = ref(props.showSeconds);
+const showPrayerTimesToggle = ref(props.showPrayerTimes);
+const showPatternToggle = ref(props.showPattern);
 const showCitySelector = ref(false);
 
 const handleSave = () => {
   const settings = {
     showDate: showDateToggle.value,
     showHijriDate: showHijriDateToggle.value,
-    showSeconds: showSecondsToggle.value
+    showSeconds: showSecondsToggle.value,
+    showPrayerTimes: showPrayerTimesToggle.value,
+    showPattern: showPatternToggle.value,
   };
 
   if (selectedCity.value !== props.currentCity) {
@@ -62,11 +74,15 @@ const handleClose = () => {
 
 const handleCitySelect = (city) => {
   selectedCity.value = city;
+  store.setSelectedCity(selectedCity.value);
+  emit('refresh');
+  emit('close');
 };
 
 const handleThemeChange = (theme) => {
   selectedTheme.value = theme;
   emit('updateSettings', { theme });
+  emit('close');
 };
 </script>
 
@@ -75,11 +91,17 @@ const handleThemeChange = (theme) => {
     <div class="bg-base-100 p-4 rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90dvh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Ayarlar</h2>
-        <button class="btn btn-circle btn-ghost btn-sm" @click="handleClose">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div class="flex justify-end gap-2">
+          <button class="btn btn-primary btn-sm" @click="handleSave">
+            Kaydet
+          </button>
+
+          <button class="btn btn-circle btn-ghost btn-sm" @click="handleClose">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div class="space-y-4">
@@ -124,22 +146,42 @@ const handleThemeChange = (theme) => {
           </label>
         </div>
 
+        <!-- Show Prayer Times Toggle -->
+        <div class="form-control !mt-0">
+          <label class="label cursor-pointer justify-start gap-4">
+            <span class="label-text">Namaz Vakitlerini Göster</span>
+            <input type="checkbox" class="toggle toggle-primary" v-model="showPrayerTimesToggle" />
+          </label>
+        </div>
+
+        <!-- Show Background Pattern Toggle -->
+        <div class="form-control !mt-0">
+          <label class="label cursor-pointer justify-start gap-4">
+            <span class="label-text">Arka Plan Desenini Göster</span>
+            <input type="checkbox" class="toggle toggle-primary" v-model="showPatternToggle" />
+          </label>
+        </div>
+
         <!-- Theme Selection -->
         <div class="form-control">
           <label class="label py-1">
             <span class="label-text">Tema</span>
           </label>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
             <button
               v-for="theme in themes"
               :key="theme.value"
-              class="btn btn-sm"
-              :class="[
-                selectedTheme === theme.value ? 'btn-primary' : 'btn-outline',
-              ]"
+              :data-theme="theme.value"
+              class="theme-card"
+              :class="{ 'theme-card--active': selectedTheme === theme.value }"
               @click="handleThemeChange(theme.value)"
             >
-              {{ theme.label }}
+              <span
+                class="text-primary font-bold leading-none"
+                :style="{ fontFamily: theme.font }"
+              >
+                {{ theme.label }}
+              </span>
             </button>
           </div>
         </div>
@@ -148,16 +190,28 @@ const handleThemeChange = (theme) => {
            <!-- API Disclaimer -->
            <div class="card bg-base-200">
              <div class="card-body p-3">
-               <p class="text-xs opacity-70">
+               <!-- <p class="text-xs opacity-70">
                  Namaz vakitleri
                  <a
-                   href="https://aladhan.com/prayer-times-api"
+                  href="https://aladhan.com/prayer-times-api"
                    target="_blank"
                    rel="noopener noreferrer"
                    class="link link-primary"
                  >
-                   Aladhan API
+                 Aladhan API
                  </a> tarafından sağlanmaktadır. Vakitler resmi kaynaklardan farklılık gösterebilir.
+               </p> -->
+
+               <p class="text-xs opacity-70">
+                 Namaz vakitleri
+                 <a
+                  href="https://ezanvakti.emushaf.net/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="link link-primary"
+                 >
+                  Diyanet İşleri Başkanlığı
+                 </a> tarafından sağlanmaktadır.
                </p>
              </div>
            </div>
@@ -179,13 +233,6 @@ const handleThemeChange = (theme) => {
              </div>
            </div>
          </div>
-
-        <!-- Save Button -->
-        <div class="flex justify-end">
-          <button class="btn btn-primary btn-sm" @click="handleSave">
-            Kaydet
-          </button>
-        </div>
       </div>
     </div>
 
@@ -199,3 +246,21 @@ const handleThemeChange = (theme) => {
     />
   </div>
 </template>
+
+<style scoped>
+.theme-card {
+  @apply flex flex-col items-center justify-center
+    aspect-[3/1] rounded-lg cursor-pointer
+    border border-base-content/10
+    bg-gradient-to-br from-base-100 to-base-300
+    transition-all duration-200;
+}
+
+.theme-card:hover {
+  @apply scale-[1.05] shadow-md;
+}
+
+.theme-card--active {
+  @apply ring-2 ring-offset-2 ring-primary;
+}
+</style>

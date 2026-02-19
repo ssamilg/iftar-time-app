@@ -29,6 +29,8 @@ const showSettings = ref(false);
 const showDate = ref(localStorage.getItem('showDate') !== 'false');
 const showHijriDate = ref(localStorage.getItem('showHijriDate') !== 'false');
 const showSeconds = ref(localStorage.getItem('showSeconds') !== 'false');
+const showPrayerTimes = ref(localStorage.getItem('showPrayerTimes') !== 'false');
+const showPattern = ref(localStorage.getItem('showPattern') !== 'false');
 const showDua = ref(false);
 
 const state = reactive({
@@ -193,6 +195,14 @@ const handleSettingsUpdate = (settings) => {
     localStorage.setItem('showSeconds', settings.showSeconds);
     showSeconds.value = settings.showSeconds;
   }
+  if (settings.showPrayerTimes !== undefined) {
+    localStorage.setItem('showPrayerTimes', settings.showPrayerTimes);
+    showPrayerTimes.value = settings.showPrayerTimes;
+  }
+  if (settings.showPattern !== undefined) {
+    localStorage.setItem('showPattern', settings.showPattern);
+    showPattern.value = settings.showPattern;
+  }
   emit('updateSettings', settings);
 };
 
@@ -224,7 +234,7 @@ onMounted(() => {
             <div class="flex items-center justify-center w-full gap-4">
               <div class="basis-auto">
                 <div class="text-2xl flex items-center gap-4">
-                  <div class="basis-auto">
+                  <div class="basis-auto" @click="handleSettingsClick">
                     {{ displayCity }}
                   </div>
 
@@ -265,7 +275,7 @@ onMounted(() => {
         <!-- Bottom: Prayer Times or Dua - Now positioned at the bottom -->
         <div class="mb-4">
           <transition name="fade" mode="out-in">
-            <div v-if="showDua" class="dua-container">
+            <div v-if="showDua" class="dua-container blur-2px">
               <div class="dua-text">
                 <p>Allah'ım!</p>
                 <p>
@@ -276,7 +286,7 @@ onMounted(() => {
                 <p>Amin</p>
               </div>
             </div>
-            <PrayerTimes v-else :times="state.times" />
+            <PrayerTimes v-else-if="showPrayerTimes" :times="state.times" />
           </transition>
         </div>
       </div>
@@ -290,6 +300,8 @@ onMounted(() => {
       :show-date="showDate"
       :show-hijri-date="showHijriDate"
       :show-seconds="showSeconds"
+      :show-prayer-times="showPrayerTimes"
+      :show-pattern="showPattern"
       :themes="props.themes"
       @close="handleSettingsClose"
       @update-settings="handleSettingsUpdate"

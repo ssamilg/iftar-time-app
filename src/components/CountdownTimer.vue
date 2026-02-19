@@ -144,7 +144,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex justify-center flex-col items-center">
+  <div class="flex justify-center flex-col items-center backdrop-blur-[2px]">
     <div class="basis-auto">
       <div class="timer-title">
         <template v-if="showIftarMessage">

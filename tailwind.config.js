@@ -31,10 +31,16 @@ export default {
           "base-200": "#2C3E50",  /* Warmer, more peachy undertone */
           "primary": "#FBE6C2",   /* Warm parchment text */
         },
-        ottoman: {
+        sufi: {
           "base-100": "#F8F3E6",  /* Rich cream/parchment */
           "base-200": "#D5B3A7",  /* Slightly warmer for gradient */
-          "primary": "#9B2242",   /* Deep Ottoman crimson */
+          "primary": "#9B2242",   /* Deep dried rose crimson */
+        },
+        ottoman: {
+          "base-100": "#021a10",  /* Deep imperial plum */
+          "base-200": "#064e3b",  /* Darker violet for gradient */
+          "primary": "#e2e8f0",   /* Pale gold text */
+          "--primary-content": "#FFECC3",  /* Bright gold for UI accents */
         },
         seljuk: {
           "base-100": "#006D7C",   /* Rich blue-turquoise - that sweet spot between dark blue and turquoise */
@@ -57,6 +63,12 @@ export default {
           "base-200": "#654321",  /* Darker sand for gradient depth */
           "primary": "#E6C79C",   /* Light sand color for text */
           "--primary-content": "#C4661F",  /* Spice melange orange for UI elements */
+        },
+        andalus: {
+          "base-100": "#3A0606",  /* Deep burgundy palace walls */
+          "base-200": "#2C0404",  /* Darker burgundy for gradient */
+          "primary": "#E0C097",   /* Soft Gold/Cream text */
+          "--primary-content": "#FBF5B7",  /* Bright gold for UI accents */
         },
       },
     ],
