@@ -190,9 +190,8 @@ const handleThemeChange = (theme) => {
            <!-- API Disclaimer -->
            <div class="card bg-base-200">
              <div class="card-body p-3">
-               <p class="text-xs opacity-70">
+               <!-- <p class="text-xs opacity-70">
                  Namaz vakitleri
-                 <!-- href="https://ezanvakti.emushaf.net/" -->
                  <a
                   href="https://aladhan.com/prayer-times-api"
                    target="_blank"
@@ -200,8 +199,19 @@ const handleThemeChange = (theme) => {
                    class="link link-primary"
                  >
                  Aladhan API
-                   <!-- Diyanet -->
                  </a> tarafından sağlanmaktadır. Vakitler resmi kaynaklardan farklılık gösterebilir.
+               </p> -->
+
+               <p class="text-xs opacity-70">
+                 Namaz vakitleri
+                 <a
+                  href="https://ezanvakti.emushaf.net/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="link link-primary"
+                 >
+                  Diyanet İşleri Başkanlığı
+                 </a> tarafından sağlanmaktadır.
                </p>
              </div>
            </div>
