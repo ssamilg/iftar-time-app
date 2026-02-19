@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, nextTick, computed } from 'vue';
+import { ref, watch, nextTick, computed, onBeforeUnmount } from 'vue';
 import { getHijriMonthById } from '@/constants/hijriMonths';
 
 const props = defineProps({
@@ -16,6 +16,90 @@ const props = defineProps({
 const emit = defineEmits(['close']);
 
 const todayCardRef = ref(null);
+const drawerContentRef = ref(null);
+const dragOffset = ref(0);
+const isDragging = ref(false);
+const isSnapping = ref(false);
+const dragStartY = ref(0);
+const scrollableRef = ref(null);
+
+const CLOSE_THRESHOLD = 120;
+
+const getClientY = (e) => {
+  return e.touches ? e.touches[0].clientY : e.clientY;
+};
+
+const onDragStart = (e) => {
+  dragStartY.value = getClientY(e);
+  isDragging.value = true;
+  dragOffset.value = 0;
+};
+
+const onHandleDragStart = (e) => {
+  e.preventDefault();
+  onDragStart(e);
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('mouseup', onDragEnd);
+};
+
+const isScrolledToTop = () => {
+  if (!scrollableRef.value) return true;
+  return scrollableRef.value.scrollTop <= 0;
+};
+
+const onContentTouchStart = (e) => {
+  if (isScrolledToTop()) {
+    dragStartY.value = getClientY(e);
+    isDragging.value = false;
+    dragOffset.value = 0;
+  }
+};
+
+const onDragMove = (e) => {
+  if (!dragStartY.value && !isDragging.value) return;
+
+  const currentY = getClientY(e);
+  const delta = currentY - dragStartY.value;
+
+  if (!isDragging.value && delta > 5 && isScrolledToTop()) {
+    isDragging.value = true;
+  }
+
+  if (isDragging.value) {
+    dragOffset.value = Math.max(0, delta);
+    if (e.cancelable) e.preventDefault();
+  }
+};
+
+const onDragEnd = () => {
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup', onDragEnd);
+
+  if (!isDragging.value) return;
+
+  isSnapping.value = true;
+  isDragging.value = false;
+
+  if (dragOffset.value > CLOSE_THRESHOLD) {
+    dragOffset.value = window.innerHeight;
+    setTimeout(() => {
+      emit('close');
+      dragOffset.value = 0;
+      isSnapping.value = false;
+    }, 300);
+    return;
+  }
+
+  dragOffset.value = 0;
+  setTimeout(() => {
+    isSnapping.value = false;
+  }, 300);
+};
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup', onDragEnd);
+});
 
 const todayStr = computed(() => {
   const d = new Date();
@@ -84,14 +168,32 @@ watch(() => props.show, (visible) => {
     >
       <div class="drawer-backdrop" @click="emit('close')"></div>
 
-      <div class="drawer-content">
-        <div class="drawer-handle" @click="emit('close')">
+      <div
+        ref="drawerContentRef"
+        class="drawer-content"
+        :class="{ 'drawer-content--snapping': isSnapping }"
+        :style="isDragging || isSnapping ? { transform: `translateY(${dragOffset}px)` } : null"
+      >
+        <div
+          class="drawer-handle"
+          @click="emit('close')"
+          @mousedown="onHandleDragStart"
+          @touchstart.passive="onDragStart"
+          @touchmove="onDragMove"
+          @touchend="onDragEnd"
+        >
           <div class="w-10 h-1 rounded-full bg-primary/30 mx-auto"></div>
         </div>
 
         <h3 class="text-lg font-semibold text-center mb-3">İmsakiye</h3>
 
-        <div class="flex flex-col gap-3 px-4 pb-6 overflow-y-auto flex-1">
+        <div
+          ref="scrollableRef"
+          class="flex flex-col gap-3 px-4 pb-6 overflow-y-auto flex-1"
+          @touchstart.passive="onContentTouchStart"
+          @touchmove="onDragMove"
+          @touchend="onDragEnd"
+        >
           <div
             v-for="day in monthlyTimes"
             :key="day.MiladiTarihKisa"
@@ -157,10 +259,16 @@ watch(() => props.show, (visible) => {
 .drawer-content {
   @apply relative z-10 w-full max-w-lg lg:max-w-xl bg-base-100 rounded-t-2xl
     flex flex-col max-h-[85vh];
+  will-change: transform;
+}
+
+.drawer-content--snapping {
+  transition: transform 0.3s ease;
 }
 
 .drawer-handle {
-  @apply py-3 cursor-pointer;
+  @apply py-3 cursor-grab active:cursor-grabbing;
+  touch-action: none;
 }
 
 .imsakiye-card {
