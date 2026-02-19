@@ -8,6 +8,7 @@ export const useStore = defineStore('index', {
     selectedCity: localStorage.getItem('selectedCity') || 'Ankara',
     prayerTimes: null,
     nextDayTimes: null,
+    monthlyTimes: [],
     isLoading: false,
     hijriDate: null,
   }),
@@ -64,6 +65,7 @@ export const useStore = defineStore('index', {
           const result = await getDiyanetPrayerTimes(this.selectedCity);
           this.prayerTimes = result.today;
           this.nextDayTimes = result.tomorrow;
+          this.monthlyTimes = result.monthly || [];
           this.hijriDate = result.today?.data?.date?.hijri;
         } else {
           const params = { country, method: 13 };

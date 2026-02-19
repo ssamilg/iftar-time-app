@@ -5,6 +5,7 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { useStore } from '@/stores';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import PrayerTimes from '@/components/PrayerTimes.vue';
+import ImsakiyeDrawer from '@/components/ImsakiyeDrawer.vue';
 import SettingsPage from '@/views/SettingsPage.vue';
 import { getHijriMonthById } from '@/constants/hijriMonths';
 
@@ -32,6 +33,7 @@ const showSeconds = ref(localStorage.getItem('showSeconds') !== 'false');
 const showPrayerTimes = ref(localStorage.getItem('showPrayerTimes') !== 'false');
 const showPattern = ref(localStorage.getItem('showPattern') !== 'false');
 const showDua = ref(false);
+const showImsakiye = ref(false);
 
 const state = reactive({
   times: [],
@@ -238,6 +240,10 @@ onMounted(() => {
                     {{ displayCity }}
                   </div>
 
+                  <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="showImsakiye = true">
+                    <i class="bi bi-calendar3"></i>
+                  </button>
+
                   <button class="btn btn-circle btn-primary btn-ghost btn-sm" @click="handleSettingsClick">
                     <i class="bi bi-gear"></i>
                   </button>
@@ -289,8 +295,23 @@ onMounted(() => {
             <PrayerTimes v-else-if="showPrayerTimes" :times="state.times" />
           </transition>
         </div>
+
+        <div
+          class="flex justify-center pb-2 cursor-pointer opacity-40
+            hover:opacity-70 transition-opacity"
+          @click="showImsakiye = true"
+        >
+          <i class="bi bi-chevron-double-up text-xl animate-bounce-slow"></i>
+        </div>
       </div>
     </div>
+
+    <!-- Imsakiye Drawer -->
+    <ImsakiyeDrawer
+      :show="showImsakiye"
+      :monthly-times="store.monthlyTimes"
+      @close="showImsakiye = false"
+    />
 
     <!-- Settings Modal -->
     <SettingsPage
@@ -403,5 +424,18 @@ onMounted(() => {
 .dua-text {
   @apply text-center text-lg sm:text-xl md:text-2xl italic font-medium text-primary/90 mx-2 px-4 py-6 rounded-lg bg-primary/10 border border-primary/20 shadow-sm max-w-sm md:max-w-xl;
   line-height: 1.6;
+}
+
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 2s ease-in-out infinite;
 }
 </style>

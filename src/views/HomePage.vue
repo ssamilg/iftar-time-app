@@ -105,11 +105,6 @@ onMounted(() => {
         />
       </div>
 
-      <div class="text-center py-4">
-        <a href="https://ssamilg.dev" class="text-primary hover:opacity-80 transition-opacity">
-          SSG
-        </a>
-      </div>
     </div>
   </div>
 </template>
