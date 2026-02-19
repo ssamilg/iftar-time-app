@@ -111,10 +111,12 @@ watch(() => props.show, (visible) => {
             <div class="flex items-center justify-between mt-1.5">
               <div class="text-xl font-bold flex items-center gap-1.5">
                 <i class="bi bi-moon-stars-fill text-base opacity-60"></i>
+                <span class="text-xs font-normal opacity-60">İmsak</span>
                 {{ day.Imsak }}
               </div>
               <div class="text-xl font-bold flex items-center gap-1.5">
                 {{ day.Aksam }}
+                <span class="text-xs font-normal opacity-60">Akşam</span>
                 <i class="bi bi-moon-fill text-base opacity-60"></i>
               </div>
             </div>
@@ -125,19 +127,19 @@ watch(() => props.show, (visible) => {
             >
               <span class="flex items-center gap-1">
                 <i class="bi bi-sunrise-fill"></i>
-                {{ day.Gunes }}
+                Güneş {{ day.Gunes }}
               </span>
               <span class="flex items-center gap-1">
                 <i class="bi bi-sun-fill"></i>
-                {{ day.Ogle }}
+                Öğle {{ day.Ogle }}
               </span>
               <span class="flex items-center gap-1">
                 <i class="bi bi-sunset-fill"></i>
-                {{ day.Ikindi }}
+                İkindi {{ day.Ikindi }}
               </span>
               <span class="flex items-center gap-1">
                 <i class="bi bi-stars"></i>
-                {{ day.Yatsi }}
+                Yatsı {{ day.Yatsi }}
               </span>
             </div>
           </div>
